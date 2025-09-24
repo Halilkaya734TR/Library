@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Giriş</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: linear-gradient(135deg, #89CFF0, #4682B4);
+        }
+        .login {
+            width: 400px;
+            padding: 30px;
+            background-color: #ffffff;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 15px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+        }
+        .button {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .button button {
+            flex: 1;
+            margin: 0 5px;
+            padding: 10px;
+            background-color: #4682B4;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .button button:hover {
+            background-color: #315f7d;
+        }
+        .member label {
+            font-weight: bold;
+            display: block;
+            margin: 10px 0 5px;
+        }
+        .member input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #bbb;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+        .member button {
+            width: 100%;
+            padding: 12px;
+            background-color: #5cb85c;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .member button:hover {
+            background-color: #449d44;
+        }
+    </style>
+</head>
+<body>
+    <div class="login">
+        <div class="button">
+            <button>Üye Girişi</button>
+            <button>Admin Girişi</button>
+        </div>
+        <div class="member">
+            <form>
+                <label for="name">Kullanıcı Adı:</label>
+                <input type="text" id="name" name="name" placeholder="Kullanıcı adınızı girin">
+
+                <label for="password">Şifre:</label>
+                <input type="password" id="password" name="password" placeholder="Şifrenizi girin">
+
+                <button type="submit">Giriş Yap</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
