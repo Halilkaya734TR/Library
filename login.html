@@ -65,25 +65,71 @@
         .member button:hover {
             background-color: #449d44;
         }
+        .toggle {
+            text-align: center;
+            margin-top: 10px;
+        }
+        .toggle a {
+            color: #4682B4;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .toggle a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
     <div class="login">
         <div class="button">
-            <button>Üye Girişi</button>
-            <button>Admin Girişi</button>
+            <button onclick="showForm('user')">Üye Girişi</button>
+            <button onclick="showForm('admin')">Admin Girişi</button>
         </div>
         <div class="member">
-            <form>
-                <label for="name">Kullanıcı Adı:</label>
-                <input type="text" id="name" name="name" placeholder="Kullanıcı adınızı girin">
-
-                <label for="password">Şifre:</label>
-                <input type="password" id="password" name="password" placeholder="Şifrenizi girin">
-
+            <form id="loginForm">
+                <div id="formContent"></div>
                 <button type="submit">Giriş Yap</button>
             </form>
+            <div class="toggle">
+                <a onclick="showForm('register')">Kayıt Ol</a>
+            </div>
         </div>
     </div>
+
+    <script>
+        function showForm(type) {
+            let formContent = document.getElementById("formContent");
+            let button = document.querySelector(".member button");
+            if (type === "user") {
+                formContent.innerHTML = `
+                    <label for="name">Kullanıcı Adı:</label>
+                    <input type="text" id="name" name="name" placeholder="Kullanıcı adınızı girin">
+                    <label for="password">Şifre:</label>
+                    <input type="password" id="password" name="password" placeholder="Şifrenizi girin">
+                `;
+                button.textContent = "Giriş Yap";
+            } else if (type === "admin") {
+                formContent.innerHTML = `
+                    <label for="adminName">Admin Adı:</label>
+                    <input type="text" id="adminName" name="adminName" placeholder="Admin adını girin">
+                    <label for="adminPass">Şifre:</label>
+                    <input type="password" id="adminPass" name="adminPass" placeholder="Şifrenizi girin">
+                `;
+                button.textContent = "Admin Girişi";
+            } else if (type === "register") {
+                formContent.innerHTML = `
+                    <label for="newUser">Kullanıcı Adı:</label>
+                    <input type="text" id="newUser" name="newUser" placeholder="Yeni kullanıcı adı">
+                    <label for="email">E-posta:</label>
+                    <input type="email" id="email" name="email" placeholder="E-posta adresiniz">
+                    <label for="newPass">Şifre:</label>
+                    <input type="password" id="newPass" name="newPass" placeholder="Şifre belirleyin">
+                `;
+                button.textContent = "Kayıt Ol";
+            }
+        }
+
+        showForm('user');
+    </script>
 </body>
 </html>
