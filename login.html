@@ -4,12 +4,14 @@
     <meta charset="UTF-8">
     <title>Giriş</title>
     <style>
-        body {
+        body 
+        {
             margin: 0;
             font-family: Arial, Helvetica, sans-serif;
             background: linear-gradient(135deg, #89CFF0, #4682B4);
         }
-        .login {
+        .login 
+        {
             width: 400px;
             padding: 30px;
             background-color: #ffffff;
@@ -20,12 +22,14 @@
             border-radius: 15px;
             box-shadow: 0 6px 18px rgba(0,0,0,0.2);
         }
-        .button {
+        .button 
+        {
             display: flex;
             justify-content: space-between;
             margin-bottom: 20px;
         }
-        .button button {
+        .button button 
+        {
             flex: 1;
             margin: 0 5px;
             padding: 10px;
@@ -36,22 +40,26 @@
             cursor: pointer;
             transition: background 0.3s;
         }
-        .button button:hover {
+        .button button:hover 
+        {
             background-color: #315f7d;
         }
-        .member label {
+        .member label 
+        {
             font-weight: bold;
             display: block;
             margin: 10px 0 5px;
         }
-        .member input {
+        .member input 
+        {
             width: 100%;
             padding: 10px;
             border: 1px solid #bbb;
             border-radius: 6px;
             margin-bottom: 15px;
         }
-        .member button {
+        .member button 
+        {
             width: 100%;
             padding: 12px;
             background-color: #5cb85c;
@@ -62,19 +70,23 @@
             cursor: pointer;
             transition: background 0.3s;
         }
-        .member button:hover {
+        .member button:hover 
+        {
             background-color: #449d44;
         }
-        .toggle {
+        .toggle 
+        {
             text-align: center;
             margin-top: 10px;
         }
-        .toggle a {
+        .toggle a 
+        {
             color: #4682B4;
             text-decoration: none;
             cursor: pointer;
         }
-        .toggle a:hover {
+        .toggle a:hover 
+        {
             text-decoration: underline;
         }
     </style>
@@ -97,10 +109,12 @@
     </div>
 
     <script>
-        function showForm(type) {
+        function showForm(type) 
+        {
             let formContent = document.getElementById("formContent");
             let button = document.querySelector(".member button");
-            if (type === "user") {
+            if (type === "user") 
+            {
                 formContent.innerHTML = `
                     <label for="name">Kullanıcı Adı:</label>
                     <input type="text" id="name" name="name" placeholder="Kullanıcı adınızı girin">
@@ -108,7 +122,9 @@
                     <input type="password" id="password" name="password" placeholder="Şifrenizi girin">
                 `;
                 button.textContent = "Giriş Yap";
-            } else if (type === "admin") {
+            } 
+            else if (type === "admin") 
+            {
                 formContent.innerHTML = `
                     <label for="adminName">Admin Adı:</label>
                     <input type="text" id="adminName" name="adminName" placeholder="Admin adını girin">
@@ -116,7 +132,9 @@
                     <input type="password" id="adminPass" name="adminPass" placeholder="Şifrenizi girin">
                 `;
                 button.textContent = "Admin Girişi";
-            } else if (type === "register") {
+            } 
+            else if (type === "register") 
+            {
                 formContent.innerHTML = `
                     <label for="newUser">Kullanıcı Adı:</label>
                     <input type="text" id="newUser" name="newUser" placeholder="Yeni kullanıcı adı">
@@ -130,6 +148,21 @@
         }
 
         showForm('user');
+        document.getElementById("loginForm").addEventListener("submit", function(event) {
+        event.preventDefault(); 
+
+        const button = document.querySelector(".member button").textContent;
+
+        if (button === "Giriş Yap") 
+        {
+            window.location.href = "member.html";
+        } 
+        else if (button === "Admin Girişi") 
+        {
+            window.location.href = "admin.html";
+        } 
+    });
+
     </script>
 </body>
 </html>
