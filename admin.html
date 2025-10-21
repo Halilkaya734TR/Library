@@ -5,22 +5,34 @@
     <title>Admin Sayfası</title>
     <style>
         body 
-        {
-            height: 100vh;
+        {   
             margin: 0;
+            padding: 0;
+            height: 100vh;
+            background-image: linear-gradient(lightblue, darkblue);
             display: flex;
-            justify-content: center; 
+            justify-content: center;  
             align-items: center;     
-            background-color: #f0f4f8;
             font-family: Arial, sans-serif;
         }
 
-        .options 
+        .panel 
         {
             text-align: center;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 40px 60px;
+            border-radius: 16px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
         }
 
-        button 
+        h1 
+        {
+            margin-bottom: 30px;
+            color: black;
+            font-size: 32px;
+        }
+
+        .options button 
         {
             margin: 10px;
             padding: 12px 20px;
@@ -33,28 +45,20 @@
             transition: background-color 0.3s;
         }
 
-        button:hover 
+        .options button:hover 
         {
             background-color: #005fcc;
-        }
-        
-
-        h1 
-        {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #333;
         }
     </style>
 </head>
 <body>
-    <div>
+    <div class="panel">
         <h1>Admin Paneli</h1>
         <div class="options">
-            <button> Kitap Ekle / Güncelle / Sil</button>
-            <button> Yazar Ekle / Güncelle / Sil</button><br>
-            <button> Kategori Ekle / Güncelle / Sil</button>
-            <button onclick="window.location.href='login.html'"> Çıkış Yap</button>
+            <button>Kitap Ekle / Güncelle / Sil</button>
+            <button>Yazar Ekle / Güncelle / Sil</button><br>
+            <button>Kategori Ekle / Güncelle / Sil</button>
+            <button onclick="window.location.href='login.html'">Çıkış Yap</button>
         </div>
     </div>
 </body>
