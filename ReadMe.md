@@ -1,9 +1,9 @@
 # <center>Kütüphane Ödevi(Yapım Aşamasında)</center>
 
-## Yenilikler (14.10.25)
-- ```member.html``` ve ```admin.html``` eklendi.
-- ```login.html``` düzenlemeler yapıldı. Diğer html ile bağdaştırıldı ama kontrol etmiyor şuanlık. Daha sonra ekleyeceğim.
-- ```member.html``` ve ```admin.html``` butonlar işlevselliği yok daha. Sadece çıkış butonu ```login.html``` sayfasına götürüyor.
+## Yenilikler (21.10.25)
+- Çok değişiklik yapılmadı. Sayfaların arkaplanı ve yönetim paneli güzelleştirildi.
+- Kalan işlemler genel olarak Vt ve backend olduğundan biraz daha öğrenip eklemeler yapılacaktır.
+- Resimler yeni halleriyle güncellendi!
 
 ## İçindekiler
 - [Sayfa Görünümü](#sayfa-görünümü)  
