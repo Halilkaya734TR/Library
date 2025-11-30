@@ -1,9 +1,11 @@
 # <center>Kütüphane Ödevi(Yapım Aşamasında)</center>
 
-## Yenilikler (21.10.25)
-- Çok değişiklik yapılmadı. Sayfaların arkaplanı ve yönetim paneli güzelleştirildi.
-- Kalan işlemler genel olarak Vt ve backend olduğundan biraz daha öğrenip eklemeler yapılacaktır.
-- Resimler yeni halleriyle güncellendi!
+## Yenilikler (30.10.25)
+- **backend.py** içindeki yeni kodlar sayesinde veri tabanından bilgilerini alıp kullanıcı kontrol edip üye sayfasına geçiyor. Yanlışsa aynı sayfada kalınıyor
+- **login.html** içindeki form Flask uygun hale getirildi.
+- **login.html** artık Kullanıcı Adı yerine email soruyor.
+- html dosyaları templates dosyası altında toplandı.
+- ER ilişkisi (Hala çok hatalı zamanla düzelecek.) ve bazı fotoğraftlar yeni halleriyle güncellendi!
 
 ## İçindekiler
 - [Sayfa Görünümü](#sayfa-görünümü)  
@@ -38,4 +40,4 @@
 
 ## Kapanış
 
-- Çok ekleme yapmadığımdan gösterebileceğim başka bi şey bulunmamaktadır. Daha sonraları ek güncellemeleri düzeltmeler gelecektir. Baktığınız için teşekkür ederim.
+- Yakında yeni commitle backend giriş komutları ve ek şeyler eklenecektir.
