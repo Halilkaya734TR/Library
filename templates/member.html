@@ -55,12 +55,11 @@
     <div class="panel">
         <h1>Üye Paneli</h1>
         <div class="options">
-            <button>Kitap Ara</button>
+            <button onclick="window.location.href='{{ url_for('user.kitaplarSayfasi') }}'">Kitap Ara</button>
             <button>Ödünç Alma</button><br>
             <button>İade Etme</button>
             <button>Ceza Bilgi</button>
-            <button onclick="window.location.href='login.html'">Çıkış Yap</button>
+            <button onclick="window.location.href='{{ url_for('user.logout') }}'">Çıkış Yap</button>
         </div>
     </div>
 </body>
-</html>

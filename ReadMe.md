@@ -1,11 +1,10 @@
 # <center>Kütüphane Ödevi(Yapım Aşamasında)</center>
 
-## Yenilikler (30.10.25)
-- **backend.py** içindeki yeni kodlar sayesinde veri tabanından bilgilerini alıp kullanıcı kontrol edip üye sayfasına geçiyor. Yanlışsa aynı sayfada kalınıyor
-- **login.html** içindeki form Flask uygun hale getirildi.
-- **login.html** artık Kullanıcı Adı yerine email soruyor.
-- html dosyaları templates dosyası altında toplandı.
-- ER ilişkisi (Hala çok hatalı zamanla düzelecek.) ve bazı fotoğraftlar yeni halleriyle güncellendi!
+## Yenilikler (01.10.25)
+- Katmanlı yapıya geçildi. config, models, repository, routes, services klasörlere ayrıldı.
+- kitaplar.html adında yeni sayfa eklendi ve kitaplar gözüküyor. Sonradan işlevsel şeyler eklenecek.
+- Çıkış butonu çalışıyor
+- ER diyagramı tekrar düzenlendi ama hala iyi düzeyde değil. Projenin sonuna doğru epey düzgün bi hale bürünecek.
 
 ## İçindekiler
 - [Sayfa Görünümü](#sayfa-görünümü)  
@@ -16,11 +15,11 @@
 ### Giriş Üye Sayfası:
 
 ![login-üye](Resimler/login%20üye.png)
-- Kutucukların içine veri yazılıp butona basınca üye panel yönlendiriyor. Ama şuanda db daha tutmadığımdan ve denetleme yapmadığımdan her türlü giriş izin veriyor. Daha sonraları onu düzelteceğim.
+- Kutucukların içine veri yazılıp butona basınca üye panel yönlendiriyor. Artık bilgiler doğruysa üye panel geçiş sağlar. Değilse geçiş olmaz.
 
 ### Giriş Admin Sayfası
-![login-adnmin](Resimler/login%20admin.png)
-- Üye ile aynı işlevlere sahip. Sadece fark olarak admin panel yönlendiriyor. Aynı şekilde bunda da daha kontrol etme yok.
+![login-admin](Resimler/login%20admin.png)
+- Üye ile aynı işlevlere sahip. Sadece fark olarak admin panel yönlendiriyor ve işlevsel olarak çalışmıyo
 
 ### Giriş Kayıt Ol Sayfası
 ![login-kayıt-ol](Resimler/login%20kayıt.png)
@@ -28,7 +27,11 @@
 
 ### Üye Panel Sayfası
 ![üye-panel](Resimler/üye%20panel.png)
-- Üyenin işlemlerini yapacağı paneldir. Şuanlık 5 buton var. Şuanlık sadece çıkış butonunun işlevi bulunmaktadır.
+- Üyenin işlemlerini yapacağı paneldir. Şuanlık 5 buton var. Şuanlık sadece Kitap Ara ve Çıkış butonu çalışmaktadır.
+
+### Kitaplar Sayfası
+![kitaplar](Resimler/kitaplar.png)
+- Database kitapları gösterir. Ger. dön butonları çalışır. İlerde eklemeler yapılacaktır.
 
 ### Admin Panel Sayfası
 ![admin-panel](Resimler/admin%20panel.png)
@@ -36,8 +39,8 @@
 
 ## ER Diyagramı
 ![ER-Diyagramı](Resimler/ER%20ilişkisi.png)
-- Şuanlık yaptığım çok güzel ve detaylı olmayan bi ER ilişkisi. Kesinlikle hatalı unsurlar vardır. Sadece şuanlık fikir olsun ve ilk hallerini de koymak istedim. Projeyi geliştirirken illa daha da güzel, düzgün ve doğru bi ER ilişkisi hazırlayacağım.
+- Daha iyi bir ER diyagramı. Yeni şeyler eklendikçe daha da güzel ve düzenli olacaktır.
 
 ## Kapanış
 
-- Yakında yeni commitle backend giriş komutları ve ek şeyler eklenecektir.
+- Yakında yeni commitle girş sayfası tamamlanacaktır.
