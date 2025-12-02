@@ -1,10 +1,9 @@
 # <center>Kütüphane Ödevi(Yapım Aşamasında)</center>
 
-## Yenilikler (01.12.25)
-- Katmanlı yapıya geçildi. config, models, repository, routes, services klasörlere ayrıldı.
-- kitaplar.html adında yeni sayfa eklendi ve kitaplar gözüküyor. Sonradan işlevsel şeyler eklenecek.
-- Çıkış butonu çalışıyor
-- ER diyagramı tekrar düzenlendi ama hala iyi düzeyde değil. Projenin sonuna doğru epey düzgün bi hale bürünecek.
+## Yenilikler (03.12.25)
+- Artık login.html bütün işlevleri çalışıyor. Üye girişi, Admin girişi ve kayıt yapabiliyor!
+- Flash mesajları gözükmüyordu. Onun için html sayfalarına özel bi yer ve animasyon ekledim.
+
 
 ## İçindekiler
 - [Sayfa Görünümü](#sayfa-görünümü)  
@@ -19,11 +18,11 @@
 
 ### Giriş Admin Sayfası
 ![login-admin](Resimler/login%20admin.png)
-- Üye ile aynı işlevlere sahip. Sadece fark olarak admin panel yönlendiriyor ve işlevsel olarak çalışmıyo
+- Üye ile aynı işlevlere sahip. Doğruysa admin panele ulaşırsınız.
 
 ### Giriş Kayıt Ol Sayfası
 ![login-kayıt-ol](Resimler/login%20kayıt.png)
-- Kayıt olmak için sayfa böyle gözükmektedir. Kayıt ol butonunun şuanlık işlevi yoktur.
+- Kayıt olmak için olan sayfadır. Aynı login.html içindedir. Aynı mail varsa kaydetmez! Yoksa kaydeder ve üyeden giriş yapabilirsiniz!
 
 ### Üye Panel Sayfası
 ![üye-panel](Resimler/üye%20panel.png)
@@ -43,4 +42,4 @@
 
 ## Kapanış
 
-- Yakında yeni commitle girş sayfası tamamlanacaktır.
+- Proje bir kaç gündür hem fronted hem backend olarak epey ekleme yaptım. Sorun olmazsa member.html daha çok işlev ekleyeceğim. Bi de yapabilirsem jwt şifreleme deneyecem.
