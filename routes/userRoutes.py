@@ -39,6 +39,21 @@ def kitaplarSayfasi():
         
     return render_template("kitaplar.html")
 
+@userBp.route("/register", methods=["POST"])
+def register():
+    name = request.form.get("yeniKullanici")
+    email = request.form.get("email")
+    sifre= request.form.get("yeniSifre")
+
+    sonuc = UserService.register(name, email, sifre)
+    if sonuc == "Mail Var":
+        flash("Bu mail zaten kayıtlı!", "danger")
+        return redirect(url_for("admin.index"))
+    
+    flash("Kayıt başarılı! Giriş yapabilirsiniz!", "success")
+    return redirect(url_for("admin.index"))
+
+
 @userBp.route("/logout")
 def logout():
     session.pop("userId", None)
