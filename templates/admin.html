@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <title>Admin Sayfası</title>
+
     <style>
-        body 
-        {   
+        body {   
             margin: 0;
             padding: 0;
             height: 100vh;
             background-image: linear-gradient(lightblue, darkblue);
             display: flex;
             justify-content: center;  
-            align-items: center;     
+            align-items: center;
             font-family: Arial, sans-serif;
         }
 
-        .panel 
-        {
+        .panel {
+            position: relative;
             text-align: center;
             background: rgba(255, 255, 255, 0.15);
             padding: 40px 60px;
@@ -25,15 +25,13 @@
             box-shadow: 0 0 20px rgba(0,0,0,0.2);
         }
 
-        h1 
-        {
+        h1 {
             margin-bottom: 30px;
             color: black;
             font-size: 32px;
         }
 
-        .options button 
-        {
+        .options button {
             margin: 10px;
             padding: 12px 20px;
             font-size: 16px;
@@ -45,21 +43,70 @@
             transition: background-color 0.3s;
         }
 
-        .options button:hover 
-        {
+        .options button:hover {
             background-color: #005fcc;
+        }
+
+        .flash {
+            position: absolute;
+            top: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            opacity: 0;
+            animation: fadeIn 0.4s forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -20px); }
+            to   { opacity: 1; transform: translate(-50%, 0); }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translate(-50%, 0); }
+            to   { opacity: 0; transform: translate(-50%, -20px); }
         }
     </style>
 </head>
+
 <body>
+
     <div class="panel">
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% set category, message = messages[-1] %}
+            <div id="flashMessage" class="flash">
+                {{ message }}
+            </div>
+          {% endif %}
+        {% endwith %}
+
         <h1>Admin Paneli</h1>
+
         <div class="options">
             <button>Kitap Ekle / Güncelle / Sil</button>
             <button>Yazar Ekle / Güncelle / Sil</button><br>
             <button>Kategori Ekle / Güncelle / Sil</button>
-            <button onclick="window.location.href='login.html'">Çıkış Yap</button>
+            <button onclick="window.location.href='/logout'">Çıkış Yap</button>
         </div>
+
     </div>
+
+    <script>
+        setTimeout(() => {
+            let msg = document.getElementById("flashMessage");
+            if (msg) {
+                msg.style.animation = "fadeOut 0.5s forwards";
+            }
+        }, 2000);
+    </script>
+
 </body>
 </html>
