@@ -1,6 +1,6 @@
 # <center>Kütüphane Ödevi(Yapım Aşamasında)</center>
 
-## Yenilikler (01.10.25)
+## Yenilikler (01.12.25)
 - Katmanlı yapıya geçildi. config, models, repository, routes, services klasörlere ayrıldı.
 - kitaplar.html adında yeni sayfa eklendi ve kitaplar gözüküyor. Sonradan işlevsel şeyler eklenecek.
 - Çıkış butonu çalışıyor
