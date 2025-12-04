@@ -1,8 +1,7 @@
 # <center>Kütüphane Ödevi(Yapım Aşamasında)</center>
 
-## Yenilikler (03.12.25)
-- Artık login.html bütün işlevleri çalışıyor. Üye girişi, Admin girişi ve kayıt yapabiliyor!
-- Flash mesajları gözükmüyordu. Onun için html sayfalarına özel bi yer ve animasyon ekledim.
+## Yenilikler (04.12.25)
+- Yenilik olarak şuanlık sadece JWT entegre edildi. Artık token üretip bunu çerezler de tutuyor.
 
 
 ## İçindekiler
@@ -42,4 +41,4 @@
 
 ## Kapanış
 
-- Proje bir kaç gündür hem fronted hem backend olarak epey ekleme yaptım. Sorun olmazsa member.html daha çok işlev ekleyeceğim. Bi de yapabilirsem jwt şifreleme deneyecem.
+- login.html sayfası tamamen bitti sayılır. Belki sonradan tasarımsal ya da işlevsel olarak daha farklı şeyler eklenebilir. member.html daha çok odaklanmayı planlıyorum.
