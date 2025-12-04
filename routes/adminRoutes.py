@@ -1,5 +1,6 @@
 from flask import Blueprint, request, session, redirect, url_for, flash, render_template
 from services.adminService import AdminService
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, set_access_cookies
 
 adminBp = Blueprint("admin", __name__)
 
@@ -14,28 +15,32 @@ def adminLogin():
 
     admin = AdminService.login(mail, sifre)
 
-    if admin:
-        session["adminId"] = admin.id
-        session["adminName"] = admin.name
-        flash("Giriş Başarılı!", "success")
-        return redirect(url_for("admin.admin"))
-    else:
+    if not admin:
         flash("Girilen bilgiler uyuşmuyor!", "danger")
         return redirect(url_for("admin.index"))
     
-@adminBp.route("/admin")
-def admin():
-    if "adminId" in session:
-        return render_template("admin.html")
+    token = create_access_token(identity=str(admin.id))
     
-    flash("Önce giriş yapmalısınız!", "danger")
-    return redirect(url_for("admin.index"))
+    session["adminId"] = admin.id
+    session["adminName"] = admin.name
+    
+    response = redirect(url_for("admin.admin"))
+    set_access_cookies(response, token)
+    
+    flash("Giriş Başarılı!", "success")
+    return response
 
-
-
+@adminBp.route("/admin")
+@jwt_required()
+def admin():
+    return render_template("admin.html")
+ 
 @adminBp.route("/logout")
 def logout():
+    response = redirect(url_for("admin.index"))
+    
     session.pop("adminId", None)
     session.pop("adminName", None)
+    
     flash("Çıkış yaptınız.", "info")
-    return redirect(url_for("admin.index"))
+    return response
