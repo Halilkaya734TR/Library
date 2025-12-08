@@ -5,7 +5,8 @@
     <title>Üye Sayfası</title>
 
     <style>
-        body {   
+        body 
+        {   
             margin: 0;
             padding: 0;
             height: 100vh;
@@ -16,7 +17,8 @@
             font-family: Arial, sans-serif;
         }
 
-        .panel {
+        .panel 
+        {
             position: relative;
             text-align: center;
             background: rgba(255, 255, 255, 0.15);
@@ -25,13 +27,15 @@
             box-shadow: 0 0 20px rgba(0,0,0,0.2);
         }
 
-        h1 {
+        h1 
+        {
             margin-bottom: 30px;
             color: black;
             font-size: 32px;
         }
 
-        .options button {
+        .options button 
+        {
             margin: 10px;
             padding: 12px 20px;
             font-size: 16px;
@@ -43,11 +47,13 @@
             transition: background-color 0.3s;
         }
 
-        .options button:hover {
+        .options button:hover 
+        {
             background-color: #005fcc;
         }
 
-        .flash {
+        .flash 
+        {
             position: absolute;
             top: -60px;
             left: 50%;
@@ -63,12 +69,14 @@
             animation: fadeIn 0.4s forwards;
         }
 
-        @keyframes fadeIn {
+        @keyframes fadeIn 
+        {
             from { opacity: 0; transform: translate(-50%, -20px); }
             to   { opacity: 1; transform: translate(-50%, 0); }
         }
 
-        @keyframes fadeOut {
+        @keyframes fadeOut 
+        {
             from { opacity: 1; transform: translate(-50%, 0); }
             to   { opacity: 0; transform: translate(-50%, -20px); }
         }
@@ -91,8 +99,8 @@
         <h1>Üye Paneli</h1>
 
         <div class="options">
-            <button onclick="window.location.href='{{ url_for('user.kitaplarSayfasi') }}'">Kitap Ara</button>
-            <button>Ödünç Alma</button><br>
+            <button onclick="window.location.href='{{ url_for('user.kitaplarSayfasi') }}'">Kitaplar</button>
+            <button>Kitaplarım</button><br>
             <button>İade Etme</button>
             <button>Ceza Bilgi</button>
             <button onclick="window.location.href='{{ url_for('user.logout') }}'">Çıkış Yap</button>
@@ -102,7 +110,8 @@
     <script>
         setTimeout(() => {
             let msg = document.getElementById("flashMessage");
-            if (msg) {
+            if (msg) 
+            {
                 msg.style.animation = "fadeOut 0.5s forwards";
             }
         }, 2000);

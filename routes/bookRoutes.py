@@ -12,10 +12,11 @@ def kitaplar():
 
     data = [
         {
-            "id": b.id, 
-            "ad": b.ad,
-            "yazar": b.yazar,
-            "yayinevi": b.yayinevi   
+            "name": b.name,
+            "author": b.author,
+            "publisher": b.publisher,
+            "category": b.category,
+            "pageNumber": b.pageNumber   
         }
         for b in books
     ]

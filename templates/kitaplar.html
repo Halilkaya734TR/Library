@@ -18,115 +18,241 @@
         }
 
         h1 
-        {
-            color: black;
-            font-size: 36px;
-            margin-bottom: 30px;
+        { 
+            color: black; font-size: 36px; margin-bottom: 10px; 
         }
 
-        #kitapTablosu {
+        #aramaKutusu 
+        {
+            padding: 10px;
+            width: 300px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 1px solid gray;
+            margin-bottom: 20px;
+        }
+
+        #kitapTablosu 
+        {
             background: rgba(255, 255, 255, 0.9);
             padding: 20px;
             border-radius: 16px;
             box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            min-width: 800px;
         }
 
-        table {
-            border-collapse: collapse;
-            width: 100%;
+        table 
+        { 
+            border-collapse: collapse; width: 100%; 
         }
 
-        th, td {
+        th, td 
+        {
             padding: 12px 15px;
             text-align: left;
             border-bottom: 1px solid #ddd;
         }
 
-        th {
-            background-color: #0078ff;
-            color: white;
-            font-weight: bold;
-            border-top-left-radius: 10px;
-            border-top-right-radius: 10px;
-        }
-        
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
+        th 
+        { 
+            background-color: #0078ff; color: white; 
         }
 
-        .geri-button {
+        tr:nth-child(even) 
+        { 
+            background-color: #f2f2f2; 
+        }
+
+        .page-buttons 
+        {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .sayfa-btn 
+        {
+            padding: 10px 20px;
+            background: #0078ff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .geri-button 
+        {
             margin-top: 20px;
             padding: 10px 20px;
-            font-size: 16px;
             border: none;
             border-radius: 8px;
             background-color: #ff3333;
             color: white;
             cursor: pointer;
-            transition: background-color 0.3s;
         }
 
-        .geri-button:hover {
-            background-color: #cc0000;
+        #oduncBtn 
+        {
+            margin-top: 25px;
+            padding: 12px 24px;
+            font-size: 18px;
+            border: none;
+            border-radius: 10px;
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+        }
+
+        #oduncBtn:hover 
+        {
+            background-color: #1e7e34;
         }
     </style>
 </head>
 <body>
     <h1>Kütüphane Kitapları</h1>
+
+    <input type="text" id="aramaKutusu" placeholder="Kitap adı ara...">
+
     <div id="kitapTablosu">
         <p>Kitaplar yükleniyor...</p>
     </div>
 
+    <div class="page-buttons">
+        <button class="sayfa-btn" id="prevBtn" disabled>◀ Önceki</button>
+        <button class="sayfa-btn" id="nextBtn">Sonraki ▶</button>
+    </div>
+
+    <button id="oduncBtn">Seçilen Kitabı Ödünç Al</button>
+
     <button class="geri-button" onclick="window.history.back()">Geri Dön</button>
 
 <script>
-    function kitaplariYukle() {
+
+    let tumKitaplar = [];
+    let goruntulenecek = [];
+    let sayfa = 0;
+    const LIMIT = 10;
+    let seciliKitap = null;
+
+    function kitaplariYukle() 
+    {
         fetch("/kitaplar")
-            .then(res => {
-                if (!res.ok) {
-                    throw new Error(`HTTP hata! Durum: ${res.status}`);
-                }
-                return res.json();
-            })
-            .then(data => {
-                let html = `
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Kitap Adı</th>
-                                <th>Yazar</th>
-                                <th>Yayınevi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                `;
-
-                data.forEach(row => {
-                    html += `
-                        <tr>
-                            <td>${row.id}</td>
-                            <td>${row.ad}</td>
-                            <td>${row.yazar}</td>
-                            <td>${row.yayinevi}</td>
-                        </tr>
-                    `;
-                });
-
-                html += `
-                        </tbody>
-                    </table>
-                `;
-                document.getElementById("kitapTablosu").innerHTML = html;
-            })
-            .catch(err => {
-                document.getElementById("kitapTablosu").innerHTML = "<h2>Hata!</h2><p>Kitap verileri sunucudan alınamadı.</p>";
-                console.error("Veri çekme hatası:", err);
-            });
+        .then(res => res.json())
+        .then(data => {
+            tumKitaplar = data;
+            goruntulenecek = tumKitaplar;
+            sayfa = 0;
+            tabloCiz();
+        });
     }
 
-    window.onload = kitaplariYukle;
+    function radioDegisti(kitapId) 
+    {
+        seciliKitap = kitapId;
+        console.log("Seçili kitap:", seciliKitap);
+    }
 
-</script>
+    function tabloCiz() 
+    {
+        let start = sayfa * LIMIT;
+        let end = start + LIMIT;
+        let parcaliListe = goruntulenecek.slice(start, end);
+
+        let html = `
+            <table>
+                <thead>
+                    <tr>
+                        <th>Seç</th>
+                        <th>Kitap Adı</th>
+                        <th>Yazar</th>
+                        <th>Yayınevi</th>
+                        <th>Kategori</th>
+                        <th>Sayfa</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        parcaliListe.forEach(row => {
+            html += `
+                <tr>
+                    <td><input type="radio" name="kitapSecim" 
+                        id="rd_${row.id}" 
+                        onchange="radioDegisti('${row.id}')"
+                        ${seciliKitap === row.id ? "checked" : ""}></td>
+
+                    <td>${row.name}</td>
+                    <td>${row.author}</td>
+                    <td>${row.publisher}</td>
+                    <td>${row.category}</td>
+                    <td>${row.pageNumber}</td>
+                </tr>
+            `;
+        });
+
+        html += "</tbody></table>";
+
+        document.getElementById("kitapTablosu").innerHTML = html;
+
+        document.getElementById("prevBtn").disabled = sayfa === 0;
+        document.getElementById("nextBtn").disabled = end >= goruntulenecek.length;
+    }
+
+    document.getElementById("aramaKutusu").addEventListener("input", function() 
+    {
+        let arama = this.value.toLowerCase();
+        goruntulenecek = tumKitaplar.filter(k => k.name.toLowerCase().includes(arama));
+        sayfa = 0;
+        tabloCiz();
+    });
+
+    document.getElementById("prevBtn").addEventListener("click", function() 
+    {
+        if (sayfa > 0) 
+        {
+            sayfa--;
+            tabloCiz();
+        }
+    });
+
+    document.getElementById("nextBtn").addEventListener("click", function() 
+    {
+        if ((sayfa + 1) * LIMIT < goruntulenecek.length) 
+        {
+            sayfa++;
+            tabloCiz();
+        }
+    });
+
+    document.getElementById("oduncBtn").addEventListener("click", function() 
+    {
+        if (seciliKitap == null) 
+        {
+            alert("Lütfen bir kitap seç!");
+            return;
+        }
+
+        fetch("/odunc-al", 
+        {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ kitapId: seciliKitap })
+        })
+        .then(res => {
+            if (res.ok) 
+            {
+                alert("Kitap ödünç alındı!");
+                seciliKitap = null;
+                tabloCiz();
+            } 
+            else 
+            {
+                alert("Hata oluştu!");
+            }
+        });
+    });
+    window.onload = kitaplariYukle;
+    </script>
 </body>
 </html>

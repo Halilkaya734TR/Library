@@ -1,6 +1,8 @@
 class Book:
-    def __init__(self, id, ad, yazar, yayinevi):
+    def __init__(self, id, name, author, publisher, category, pageNumber):
         self.id = id
-        self.ad = ad
-        self.yazar = yazar
-        self.yayinevi = yayinevi
+        self.name = name
+        self.author = author
+        self.publisher = publisher
+        self.category = category
+        self.pageNumber = pageNumber
