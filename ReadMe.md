@@ -1,7 +1,11 @@
 # <center>Kütüphane Ödevi(Yapım Aşamasında)</center>
 
-## Yenilikler (04.12.25)
-- Yenilik olarak şuanlık sadece JWT entegre edildi. Artık token üretip bunu çerezler de tutuyor.
+## Yenilikler (08.12.25)
+- Kitaplar sayfasına kitapları aramak için arama yeri, ödünç almak için radiobox, ödünç butonu (sadece endpoint veriyor şuanlık backend tarafı yapılmadı daha) ve sayfada ileri ve geri butonları eklendi!
+- Arama butonuna göre eşlenenler otomatik olarak sıralanıyorlar.
+- Sayfada 10 tane kitap gözüküyor. Kalanı diğer sayfalarda butona basarak gösteriliyor.
+- Bazı html sayfalarında ufak düzenlemeler yapıldı.
+- Database tarafında kitaplar tablosu daha düzenli, ek özellikler ve ingilizce halde düzenlendi!
 
 
 ## İçindekiler
@@ -25,11 +29,11 @@
 
 ### Üye Panel Sayfası
 ![üye-panel](Resimler/üye%20panel.png)
-- Üyenin işlemlerini yapacağı paneldir. Şuanlık 5 buton var. Şuanlık sadece Kitap Ara ve Çıkış butonu çalışmaktadır.
+- Üyenin işlemlerini yapacağı paneldir. Şuanlık 5 buton var. Şuanlık sadece Kitaplar ve Çıkış butonu çalışmaktadır.
 
 ### Kitaplar Sayfası
 ![kitaplar](Resimler/kitaplar.png)
-- Database kitapları gösterir. Ger. dön butonları çalışır. İlerde eklemeler yapılacaktır.
+- Database kitapları gösterir. Geri dön butonları çalışır. İlerde eklemeler yapılacaktır.
 
 ### Admin Panel Sayfası
 ![admin-panel](Resimler/admin%20panel.png)
@@ -41,4 +45,4 @@
 
 ## Kapanış
 
-- login.html sayfası tamamen bitti sayılır. Belki sonradan tasarımsal ya da işlevsel olarak daha farklı şeyler eklenebilir. member.html daha çok odaklanmayı planlıyorum.
+- Bi sonraki committe muhtemelen ödünç al butonu işlevsel hale getirme, admin giriş sayfasını daha farklı yere koyma ve database ek değişiklikler üzerine olacaktır.
