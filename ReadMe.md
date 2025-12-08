@@ -33,7 +33,7 @@
 
 ### Kitaplar Sayfası
 ![kitaplar](Resimler/kitaplar.png)
-- Database kitapları gösterir. Geri dön butonları çalışır. İlerde eklemeler yapılacaktır.
+- Database kitapları gösterir. Sayfada en fazla 10 tane kitap gösterir. Önceki ve Sonraki butonlarıyla diğerlerine ulaşılabilir. Arama yerinde arama yapılabilir. Ödünç Al butonu yakında çalışacaktır.
 
 ### Admin Panel Sayfası
 ![admin-panel](Resimler/admin%20panel.png)
