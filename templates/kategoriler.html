@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin | Kategori İşlemleri</title>
+    <style>
+        *
+        {
+            box-sizing:border-box;
+        }
+
+        body
+        {
+            margin:0;
+            height:100vh;
+            display:flex;
+            font-family:Segoe UI, sans-serif;
+            background:#f3f4f6;
+        }
+
+        .sidebar
+        {
+            width:240px;
+            background:#111827;
+            color:white;
+            padding:20px;
+        }
+
+        .sidebar h2
+        {
+            text-align:center;
+            margin-bottom:25px;
+        }
+
+        .sidebar button
+        {
+            width:100%;
+            padding:12px;
+            margin:6px 0;
+            background:none;
+            border:none;
+            color:white;
+            text-align:left;
+            cursor:pointer;
+            border-radius:10px;
+        }
+
+        .sidebar button:hover
+        {
+            background:#1f2937;
+        }
+        
+        .logout
+        {
+            background:#991b1b !important;
+        }
+
+        .content
+        {
+            flex:1;
+            padding:25px;
+            display:flex;
+            flex-direction:column;
+            position:relative;
+        }
+
+        .page-title
+        {
+            font-size:26px;
+            margin-bottom:12px;
+        }
+
+        .table-box
+        {
+            flex:1;
+            background:white;
+            border-radius:16px;
+            box-shadow:0 6px 18px rgba(0,0,0,.15);
+            overflow:auto;
+        }
+
+        table
+        {
+            width:100%;
+            border-collapse:collapse;
+        }
+
+        th,td
+        {
+            padding:12px 14px;
+            border-bottom:1px solid #e5e7eb;
+        }
+
+        th
+        {
+            background:#2563eb;
+            color:white;
+        }
+        tr:nth-child(even)
+        {
+            background:#f9fafb;
+        }
+
+        .bottom-bar
+        {
+            margin-top:14px;
+            background:white;
+            padding:16px;
+            border-radius:16px;
+            box-shadow:0 4px 12px rgba(0,0,0,.15);
+            display:flex;
+            align-items:center;
+            gap:10px;
+        }
+
+        input,select
+        {
+            height:42px;
+            padding:0 14px;
+            border-radius:10px;
+            border:1px solid #cbd5e1;
+        }
+
+        .btn
+        {
+            padding:10px 18px;
+            border:none;
+            border-radius:10px;
+            color:white;
+            cursor:pointer;
+        }
+
+        .add
+        {
+            background:#16a34a;
+        }
+
+        .edit
+        {
+            background:#f59e0b;
+        }
+
+        .delete
+        {
+            background:#dc2626;
+        }
+
+        .page-btn
+        {
+            background:#2563eb;
+        }
+
+        .page-btn:disabled
+        {
+            background:#94a3b8;
+        }
+
+        .modal-bg
+        {
+            position:absolute;
+            inset:0;
+            background:rgba(0,0,0,.35);
+            display:none;
+            justify-content:center;
+            align-items:center;
+            z-index:999;
+        }
+
+        .modal
+        {
+            background:white;
+            width:420px;
+            padding:24px;
+            border-radius:18px;
+            position:relative;
+            z-index:1000;
+        }
+
+        .modal input,.modal select
+        {
+            width:100%;
+            margin-bottom:12px;
+        }
+
+        .modal-actions
+        {
+            display:flex;
+            justify-content:flex-end;
+            gap:10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Admin Paneli</h2>
+        <button onclick="window.location.href='{{url_for('admin.kitapİslemler')}}'">📚 Kitap İşlemleri</button>
+        <button onclick="window.location.href='{{url_for('admin.yazarlar')}}'">✍️ Yazar İşlemleri</button>
+        <button onclick="window.location.href='{{url_for('admin.kategoriler')}}'">📂 Kategori İşlemleri</button>
+        <button onclick="window.location.href='{{url_for('admin.yayinevi')}}'">📖 Yayınevi İşlemleri</button>
+        <button class="logout" onclick="window.location.href='{{url_for('admin.logout')}}'">🚪 Çıkış</button>
+    </div>
+
+    <div class="content">
+
+        <div class="page-title">📂 Kategori İşlemleri</div>
+
+        <div class="table-box" id="kategoriTablosu">
+            <p style="padding:20px">Kategoriler yükleniyor...</p>
+        </div>
+
+        <div class="bottom-bar">
+            <button class="btn page-btn" id="prevBtn" disabled>◀</button>
+            <button class="btn page-btn" id="nextBtn">▶</button>
+
+            <input type="text" id="arama" placeholder="Kategori ara..." oninput="filtrele();">
+
+            <button class="btn add" onclick="ekleModal();">Ekle</button>
+            <button class="btn edit" onclick="duzenleModal();">Düzenle</button>
+            <button class="btn delete" onclick="sil();">Sil</button>
+        </div>
+
+        <div class="modal-bg" id="modalBg">
+            <div class="modal">
+                <h3 id="modalTitle">Kategori Ekle</h3>
+                <input type="hidden" id="categoryID">
+                <input type="text" id="categoryName" placeholder="Kategori Adı">
+                <div class="modal-actions">
+                    <button class="btn page-btn" onclick="modalKapat();">İptal</button>
+                    <button class="btn add" onclick="kaydet();">Kaydet</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-bg" id="editModalBg">
+            <div class="modal">
+                <h3>Kategori Düzenle</h3>
+                <input type="hidden" id="editCategoryID">
+                <input type="text" id="editCategoryName" placeholder="Kategori Adı">
+                <div class="modal-actions">
+                    <button class="btn page-btn" onclick="editModalKapat();">İptal</button>
+                    <button class="btn edit" onclick="duzenleKaydet();">Güncelle</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let kategoriler = [];
+        let filtre = [];
+        let secilen = [];
+        let sayfa = 0;
+        const LIMIT = 10;
+
+        let kategoriTablosu;
+        let prevBtn;
+        let nextBtn;
+        let arama;
+
+        let modalBg;
+        let modalTitle;
+        let categoryID;
+        let categoryName;
+
+        let editModalBg;
+        let editCategoryID;
+        let editCategoryName;
+
+        function yukle()
+        {
+            fetch("/admin/kategoriler")
+            .then(r=>r.json())
+            .then(d=>{
+                kategoriler = d;
+                filtre = d;
+                sayfa = 0;
+                secilen = [];
+                tablo();
+            });
+        }
+
+        function tablo()
+        {
+            let s = sayfa * LIMIT;
+            let e = s + LIMIT;
+            let liste = filtre.slice(s,e);
+
+            let h = `<table><thead><tr>
+            <th></th><th>Kategori Adı</th>
+            </tr></thead><tbody>`;
+
+            liste.forEach(k=>{
+                h += `<tr>
+                <td><input type="checkbox" value="${k.categoryID}" onchange="sec(this);"></td>
+                <td>${k.categoryName ?? ""}</td>
+                </tr>`;
+            });
+
+            h += `</tbody></table>`;
+            kategoriTablosu.innerHTML = h;
+
+            prevBtn.disabled = (sayfa === 0);
+            nextBtn.disabled = (e >= filtre.length);
+        }
+
+        function sec(c)
+        {
+            let id = String(c.value);
+
+            if(c.checked)
+            {
+                if(!secilen.includes(id)) secilen.push(id);
+            }
+            else
+            {
+                secilen = secilen.filter(x=>x!==id);
+            }
+        }
+
+        function filtrele()
+        {
+            let a = (arama.value || "").toLowerCase();
+            filtre = kategoriler.filter(k => (k.categoryName || "").toLowerCase().includes(a));
+            sayfa = 0;
+            tablo();
+        }
+
+        function ekleModal()
+        {
+            modalTitle.innerText = "Kategori Ekle";
+            categoryID.value = "";
+            categoryName.value = "";
+            modalBg.style.display = "flex";
+        }
+
+        function duzenleModal()
+        {
+            if(secilen.length != 1)
+            {
+                alert("Düzenlemek için 1 kategori seçin");
+                return;
+            }
+
+            let id = secilen[0];
+            let k = kategoriler.find(x => String(x.categoryID) == String(id));
+
+            if(!k)
+            {
+                alert("Kategori bulunamadı");
+                return;
+            }
+
+            editCategoryID.value = k.categoryID;
+            editCategoryName.value = k.categoryName;
+            editModalBg.style.display = "flex";
+        }
+
+        function kaydet()
+        {
+            let url = "/kategoriEkle";
+
+            fetch(url,{
+                method:"POST",
+                headers:{ "Content-Type":"application/json" },
+                body:JSON.stringify({
+                    categoryName: categoryName.value
+                })
+            }).then(()=>{
+                modalKapat();
+                yukle();
+            });
+        }
+
+        function duzenleKaydet()
+        {
+            fetch("/kategoriDuzenleme",{
+                method:"POST",
+                headers:{ "Content-Type":"application/json" },
+                body:JSON.stringify({
+                    categoryID: editCategoryID.value,
+                    categoryName: editCategoryName.value
+                })
+            }).then(()=>{
+                editModalKapat();
+                secilen = [];
+                yukle();
+            });
+        }
+
+        function sil()
+        {
+            if(secilen.length === 0)
+            {
+                alert("Kategori seçin");
+                return;
+            }
+
+            fetch("/kategoriSilme", {
+                method: "POST",
+                headers: { "Content-Type":"application/json" },
+                body: JSON.stringify({ ids: secilen })
+            })
+            .then(r => r.json())
+            .then(d => {
+                if(d.error){
+                    alert(d.error);
+                    return;
+                }
+                secilen = [];
+                yukle();
+            });
+        }
+
+        function modalKapat()
+        {
+            modalBg.style.display = "none";
+        }
+
+        function editModalKapat()
+        {
+            editModalBg.style.display = "none";
+        }
+
+        window.onload = ()=>{
+            kategoriTablosu = document.getElementById("kategoriTablosu");
+            prevBtn = document.getElementById("prevBtn");
+            nextBtn = document.getElementById("nextBtn");
+            arama = document.getElementById("arama");
+
+            modalBg = document.getElementById("modalBg");
+            modalTitle = document.getElementById("modalTitle");
+            categoryID = document.getElementById("categoryID");
+            categoryName = document.getElementById("categoryName");
+
+            editModalBg = document.getElementById("editModalBg");
+            editCategoryID = document.getElementById("editCategoryID");
+            editCategoryName = document.getElementById("editCategoryName");
+
+            prevBtn.onclick = ()=>{
+                if(sayfa > 0)
+                {
+                    sayfa--;
+                    tablo();
+                }
+            };
+
+            nextBtn.onclick = ()=>{
+                if((sayfa + 1) * LIMIT < filtre.length)
+                {
+                    sayfa++;
+                    tablo();
+                }
+            };
+
+            yukle();
+        };
+    </script>
+</body>
+</html>

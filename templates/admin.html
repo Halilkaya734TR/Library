@@ -2,111 +2,147 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Sayfası</title>
-
+    <title>Admin Paneli</title>
     <style>
-        body {   
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            background-image: linear-gradient(lightblue, darkblue);
-            display: flex;
-            justify-content: center;  
-            align-items: center;
-            font-family: Arial, sans-serif;
+        body
+        {
+            margin:0;
+            height:100vh;
+            display:flex;
+            font-family:Segoe UI, sans-serif;
+            background:#f3f4f6;
         }
 
-        .panel {
-            position: relative;
-            text-align: center;
-            background: rgba(255, 255, 255, 0.15);
-            padding: 40px 60px;
-            border-radius: 16px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+        .sidebar
+        {
+            width:220px;
+            background:#1f2933;
+            color:white;
+            padding:20px;
         }
 
-        h1 {
-            margin-bottom: 30px;
-            color: black;
-            font-size: 32px;
+        .sidebar h2
+        {
+            text-align:center;
+            margin-bottom:30px;
         }
 
-        .options button {
-            margin: 10px;
-            padding: 12px 20px;
-            font-size: 16px;
-            border: none;
-            border-radius: 8px;
-            background-color: #0078ff;
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.3s;
+        .sidebar button
+        {
+            width:100%;
+            padding:12px;
+            margin:8px 0;
+            background:none;
+            border:none;
+            color:white;
+            text-align:left;
+            cursor:pointer;
+            border-radius:8px;
+            transition:.3s;
         }
 
-        .options button:hover {
-            background-color: #005fcc;
+        .sidebar button:hover
+        {
+            background:#374151;
         }
 
-        .flash {
-            position: absolute;
-            top: -60px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 16px;
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-            opacity: 0;
-            animation: fadeIn 0.4s forwards;
+        .logout
+        {
+            background:#b91c1c !important;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translate(-50%, -20px); }
-            to   { opacity: 1; transform: translate(-50%, 0); }
+        .content
+        {
+            flex:1;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            flex-direction:column;
+            color:#374151;
         }
 
-        @keyframes fadeOut {
-            from { opacity: 1; transform: translate(-50%, 0); }
-            to   { opacity: 0; transform: translate(-50%, -20px); }
+        .welcome-box
+        {
+            background:white;
+            padding:50px 70px;
+            border-radius:20px;
+            box-shadow:0 10px 25px rgba(0,0,0,.15);
+            text-align:center;
+        }
+
+        .welcome-box h1
+        {
+            margin:0;
+            font-size:34px;
+            color:#1f2933;
+        }
+
+        .welcome-box p
+        {
+            margin-top:12px;
+            font-size:18px;
+            color:#6b7280;
+        }
+
+        .flash
+        {
+            position:absolute;
+            top:20px;
+            left:50%;
+            transform:translateX(-50%);
+            padding:12px 20px;
+            border-radius:10px;
+            font-weight:600;
+            background:#d1fae5;
+            color:#065f46;
+            opacity:0;
+            animation:fadeIn .4s forwards;
+        }
+
+        @keyframes fadeIn
+        {
+            from{opacity:0; transform:translate(-50%,-15px);}
+            to{opacity:1; transform:translate(-50%,0);}
+        }
+
+        @keyframes fadeOut
+        {
+            from{opacity:1;}
+            to{opacity:0;}
         }
     </style>
 </head>
-
 <body>
+    <div class="sidebar">
+        <h2>Admin Paneli</h2>
 
-    <div class="panel">
+        <button onclick="window.location.href='{{url_for('admin.kitapİslemler')}}'">📚 Kitap İşlemleri</button>
+        <button onclick="window.location.href='{{url_for('admin.yazarlar')}}'">✍️ Yazar İşlemleri</button>
+        <button onclick="window.location.href='{{url_for('admin.kategoriler')}}'">🗂️ Kategori İşlemleri</button>
+        <button onclick="window.location.href='{{url_for('admin.yayinevi')}}'">📖 Yayınevi İşlemleri</button>
+        <button class="logout" onclick="window.location.href='{{url_for('admin.logout')}}'">🚪 Çıkış</button>
+    </div>
+    <div class="content">
 
         {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
+        {% if messages %}
             {% set category, message = messages[-1] %}
             <div id="flashMessage" class="flash">
                 {{ message }}
             </div>
-          {% endif %}
+        {% endif %}
         {% endwith %}
 
-        <h1>Admin Paneli</h1>
-
-        <div class="options">
-            <button>Kitap Ekle / Güncelle / Sil</button>
-            <button>Yazar Ekle / Güncelle / Sil</button><br>
-            <button>Kategori Ekle / Güncelle / Sil</button>
-            <button onclick="window.location.href='/logout'">Çıkış Yap</button>
+        <div class="welcome-box">
+            <h1>Hoş Geldiniz, <span>{{ admin }}</span></h1>
+            <p>Kütüphane yönetim işlemlerini sol menüden gerçekleştirebilirsiniz.</p>
         </div>
-
     </div>
-
     <script>
-        setTimeout(() => {
-            let msg = document.getElementById("flashMessage");
-            if (msg) {
-                msg.style.animation = "fadeOut 0.5s forwards";
-            }
-        }, 2000);
+        setTimeout(()=>{
+            let msg=document.getElementById("flashMessage");
+            if(msg) msg.style.animation="fadeOut .5s forwards";
+        },2000);
     </script>
-
 </body>
 </html>

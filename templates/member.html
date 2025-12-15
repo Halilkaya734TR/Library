@@ -2,120 +2,119 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Üye Sayfası</title>
-
+    <title>Üye Paneli</title>
     <style>
-        body 
-        {   
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            background-image: linear-gradient(lightblue, darkblue);
-            display: flex;
-            justify-content: center;   
-            align-items: center;       
-            font-family: Arial, sans-serif;
-        }
+    body
+    {
+        margin:0;
+        height:100vh;
+        display:flex;
+        font-family:Segoe UI, sans-serif;
+        background:#f9fafb;
+    }
 
-        .panel 
-        {
-            position: relative;
-            text-align: center;
-            background: rgba(255, 255, 255, 0.15);
-            padding: 40px 60px;
-            border-radius: 16px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.2);
-        }
+    .sidebar
+    {
+        width:220px;
+        background:#1f2933;
+        color:white;
+        padding:24px 20px;
+        box-shadow:2px 0 12px rgba(0,0,0,0.15);
+    }
 
-        h1 
-        {
-            margin-bottom: 30px;
-            color: black;
-            font-size: 32px;
-        }
+    .sidebar h2
+    {
+        text-align:center;
+        margin-bottom:35px;
+        font-size:22px;
+        letter-spacing:0.5px;
+    }
 
-        .options button 
-        {
-            margin: 10px;
-            padding: 12px 20px;
-            font-size: 16px;
-            border: none;
-            border-radius: 8px;
-            background-color: #0078ff;
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
+    .sidebar button
+    {
+        width:100%;
+        padding:13px;
+        margin:8px 0;
+        background:none;
+        border:none;
+        color:white;
+        text-align:left;
+        font-size:15px;
+        border-radius:8px;
+        cursor:pointer;
+        transition:background 0.2s;
+    }
 
-        .options button:hover 
-        {
-            background-color: #005fcc;
-        }
+    .sidebar button:hover
+    {
+        background:#374151;
+    }
 
-        .flash 
-        {
-            position: absolute;
-            top: -60px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 16px;
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-            opacity: 0;
-            animation: fadeIn 0.4s forwards;
-        }
+    .logout
+    {
+        background:#b91c1c !important;
+    }
 
-        @keyframes fadeIn 
-        {
-            from { opacity: 0; transform: translate(-50%, -20px); }
-            to   { opacity: 1; transform: translate(-50%, 0); }
-        }
+    .logout:hover
+    {
+        background:#991b1b !important;
+    }
 
-        @keyframes fadeOut 
-        {
-            from { opacity: 1; transform: translate(-50%, 0); }
-            to   { opacity: 0; transform: translate(-50%, -20px); }
-        }
+    .content
+    {
+        flex:1;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+    }
 
+    .welcome-box
+    {
+        background:white;
+        padding:60px 80px;
+        border-radius:18px;
+        box-shadow:0 20px 40px rgba(0,0,0,0.1);
+        text-align:center;
+    }
+
+    .welcome-box h1
+    {
+        font-size:34px;
+        color:#111827;
+        margin-bottom:12px;
+    }
+
+    .welcome-box span
+    {
+        color:#2563eb;
+    }
+
+    .welcome-box p
+    {
+        font-size:17px;
+        color:#6b7280;
+        line-height:1.6;
+    }
     </style>
 </head>
-
 <body>
-
-    <div class="panel">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            {% set category, message = messages[-1] %}
-            <div id="flashMessage" class="flash">
-                {{ message }}
-            </div>
-          {% endif %}
-        {% endwith %}
-
-        <h1>Üye Paneli</h1>
-
-        <div class="options">
-            <button onclick="window.location.href='{{ url_for('user.kitaplarSayfasi') }}'">Kitaplar</button>
-            <button>Kitaplarım</button><br>
-            <button>İade Etme</button>
-            <button>Ceza Bilgi</button>
-            <button onclick="window.location.href='{{ url_for('user.logout') }}'">Çıkış Yap</button>
-        </div>
+    <div class="sidebar">
+        <h2>Üye Paneli</h2>
+        <button onclick="window.location.href='{{url_for('user.kitaplarSayfasi')}}'">📚 Kitaplar</button>
+        <button onclick="window.location.href='{{url_for('user.kitaplarim')}}'">📖 Kitaplarım</button>
+        <button>⚠️ Ceza Bilgi</button>
+        <button class="logout" onclick="window.location.href='{{url_for('user.logout')}}'">🚪 Çıkış</button>
     </div>
 
-    <script>
-        setTimeout(() => {
-            let msg = document.getElementById("flashMessage");
-            if (msg) 
-            {
-                msg.style.animation = "fadeOut 0.5s forwards";
-            }
-        }, 2000);
-    </script>
-
+    <div class="content">
+        <div class="welcome-box">
+            <h1>Hoş geldiniz, <span>{{ username }}</span></h1>
+            <p>
+                Kütüphane sistemine başarıyla giriş yaptınız.<br>
+                Sol menüyü kullanarak kitapları inceleyebilir,<br>
+                ödünç aldığınız kitapları yönetebilirsiniz.
+            </p>
+        </div>
+    </div>
 </body>
 </html>

@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin | Kitap İşlemleri</title>
+    <style>
+        *
+        {
+            box-sizing:border-box;
+        }
+
+        body
+        {
+            margin:0;
+            height:100vh;
+            display:flex;
+            font-family:Segoe UI, sans-serif;
+            background:#f3f4f6;
+        }
+
+        .sidebar
+        {
+            width:240px;
+            background:#111827;
+            color:white;
+            padding:20px;
+        }
+
+        .sidebar h2
+        {
+            text-align:center;
+            margin-bottom:25px;
+        }
+
+        .sidebar button
+        {
+            width:100%;
+            padding:12px;
+            margin:6px 0;
+            background:none;
+            border:none;
+            color:white;
+            text-align:left;
+            cursor:pointer;
+            border-radius:10px;
+        }
+
+        .sidebar button:hover
+        {
+            background:#1f2937;
+        }
+        
+        .logout
+        {
+            background:#991b1b !important;
+        }
+
+        .content
+        {
+            flex:1;
+            padding:25px;
+            display:flex;
+            flex-direction:column;
+            position:relative;
+        }
+
+        .page-title
+        {
+            font-size:26px;
+            margin-bottom:12px;
+        }
+
+        .table-box
+        {
+            flex:1;
+            background:white;
+            border-radius:16px;
+            box-shadow:0 6px 18px rgba(0,0,0,.15);
+            overflow:auto;
+        }
+
+        table
+        {
+            width:100%;
+            border-collapse:collapse;
+        }
+
+        th,td
+        {
+            padding:12px 14px;
+            border-bottom:1px solid #e5e7eb;
+        }
+
+        th
+        {
+            background:#2563eb;
+            color:white;
+        }
+        tr:nth-child(even)
+        {
+            background:#f9fafb;
+        }
+
+        .bottom-bar
+        {
+            margin-top:14px;
+            background:white;
+            padding:16px;
+            border-radius:16px;
+            box-shadow:0 4px 12px rgba(0,0,0,.15);
+            display:flex;
+            align-items:center;
+            gap:10px;
+        }
+
+        input,select
+        {
+            height:42px;
+            padding:0 14px;
+            border-radius:10px;
+            border:1px solid #cbd5e1;
+        }
+
+        .btn
+        {
+            padding:10px 18px;
+            border:none;
+            border-radius:10px;
+            color:white;
+            cursor:pointer;
+        }
+
+        .add
+        {
+            background:#16a34a;
+        }
+
+        .edit
+        {
+            background:#f59e0b;
+        }
+
+        .delete
+        {
+            background:#dc2626;
+        }
+
+        .page-btn
+        {
+            background:#2563eb;
+        }
+
+        .page-btn:disabled
+        {
+            background:#94a3b8;
+        }
+
+        .modal-bg
+        {
+            position:absolute;
+            inset:0;
+            background:rgba(0,0,0,.35);
+            display:none;
+            justify-content:center;
+            align-items:center;
+            z-index:999;
+        }
+
+        .modal
+        {
+            background:white;
+            width:420px;
+            padding:24px;
+            border-radius:18px;
+            position:relative;
+            z-index:1000;
+        }
+
+        .modal input,.modal select
+        {
+            width:100%;
+            margin-bottom:12px;
+        }
+
+        .modal-actions
+        {
+            display:flex;
+            justify-content:flex-end;
+            gap:10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Admin Paneli</h2>
+        <button onclick="window.location.href='{{url_for('admin.kitapİslemler')}}'">📚 Kitap İşlemleri</button>
+        <button onclick="window.location.href='{{url_for('admin.yazarlar')}}'">✍️ Yazar İşlemleri</button>
+        <button onclick="window.location.href='{{url_for('admin.kategoriler')}}'">📂 Kategori İşlemleri</button>
+        <button onclick="window.location.href='{{url_for('admin.yayinevi')}}'">📖 Yayınevi İşlemleri</button>
+        <button class="logout" onclick="window.location.href='{{url_for('admin.logout')}}'">🚪 Çıkış</button>
+    </div>
+
+    <div class="content">
+
+        <div class="page-title">📚 Kitap İşlemleri</div>
+
+        <div class="table-box" id="kitapTablosu">
+            <p style="padding:20px">Kitaplar yükleniyor...</p>
+        </div>
+
+        <div class="bottom-bar">
+            <button class="btn page-btn" id="prevBtn" disabled>◀</button>
+            <button class="btn page-btn" id="nextBtn">▶</button>
+
+            <input type="text" id="arama" placeholder="Kitap ara..." oninput="filtrele();">
+
+            <button class="btn add" onclick="ekleModal();">Ekle</button>
+            <button class="btn edit" onclick="duzenleModal();">Düzenle</button>
+            <button class="btn delete" onclick="sil();">Sil</button>
+        </div>
+
+        <div class="modal-bg" id="modalBg">
+            <div class="modal">
+                <h3 id="modalTitle">Kitap Ekle</h3>
+                <input type="hidden" id="bookID">
+                <input type="text" id="bookName" placeholder="Kitap Adı">
+                <select id="authorID"></select>
+                <select id="publisherID"></select>
+                <select id="categoryID"></select>
+                <input type="number" id="stock" placeholder="Stok">
+                <div class="modal-actions">
+                    <button class="btn page-btn" onclick="modalKapat();">İptal</button>
+                    <button class="btn add" onclick="kaydet();">Kaydet</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-bg" id="editModalBg">
+            <div class="modal">
+                <h3>Kitap Düzenle</h3>
+                <input type="hidden" id="editBookID">
+                <input type="text" id="editBookName" placeholder="Kitap Adı">
+                <select id="editAuthorID"></select>
+                <select id="editPublisherID"></select>
+                <select id="editCategoryID"></select>
+                <input type="number" id="editStock" placeholder="Stok">
+                <div class="modal-actions">
+                    <button class="btn page-btn" onclick="editModalKapat();">İptal</button>
+                    <button class="btn edit" onclick="duzenleKaydet();">Güncelle</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let kitaplar = [];
+        let filtre = [];
+        let secilen = [];
+        let sayfa = 0;
+        const LIMIT = 10;
+
+        let kitapTablosu;
+        let prevBtn;
+        let nextBtn;
+        let arama;
+
+        let modalBg;
+        let modalTitle;
+        let bookID;
+        let bookName;
+        let authorID;
+        let publisherID;
+        let categoryID;
+        let stock;
+
+        let editModalBg;
+        let editBookID;
+        let editBookName;
+        let editAuthorID;
+        let editPublisherID;
+        let editCategoryID;
+        let editStock;
+
+        function yukle()
+        {
+            fetch("/kitaplar", { credentials: 'include' })
+            .then(r=>r.json())
+            .then(d=>{
+                kitaplar = d;
+                filtre = d;
+                sayfa = 0;
+                secilen = [];
+                tablo();
+            });
+        }
+
+        function tablo()
+        {
+            let s = sayfa * LIMIT;
+            let e = s + LIMIT;
+            let liste = filtre.slice(s,e);
+
+            let h = `<table><thead><tr>
+            <th></th><th>Ad</th><th>Yazar</th><th>Yayın Evi</th><th>Kategori</th><th>Stok</th>
+            </tr></thead><tbody>`;
+
+            liste.forEach(k=>{
+                h += `<tr>
+                <td><input type="checkbox" value="${k.bookID}" onchange="sec(this);"></td>
+                <td>${k.bookName ?? ""}</td>
+                <td>${k.authorName ?? ""}</td>
+                <td>${k.publisher ?? ""}</td>
+                <td>${k.categoryName ?? ""}</td>
+                <td>${k.stock ?? ""}</td>
+                </tr>`;
+            });
+
+            h += `</tbody></table>`;
+            kitapTablosu.innerHTML = h;
+
+            prevBtn.disabled = (sayfa === 0);
+            nextBtn.disabled = (e >= filtre.length);
+        }
+
+        function sec(c)
+        {
+            let id = String(c.value);
+
+            if(c.checked)
+            {
+                if(!secilen.includes(id)) secilen.push(id);
+            }
+            else
+            {
+                secilen = secilen.filter(x=>x!==id);
+            }
+        }
+
+        function filtrele()
+        {
+            let a = (arama.value || "").toLowerCase();
+            filtre = kitaplar.filter(k => (k.bookName || "").toLowerCase().includes(a));
+            sayfa = 0;
+            tablo();
+        }
+
+        function ekleModal()
+        {
+            modalTitle.innerText = "Kitap Ekle";
+            bookID.value = "";
+            bookName.value = "";
+            stock.value = "";
+
+            yazarYayinciKategoriYukle().then(()=>{
+                authorID.value = "";
+                publisherID.value = "";
+                categoryID.value = "";
+            });
+
+            modalBg.style.display = "flex";
+        }
+
+        function duzenleModal()
+        {
+            if(secilen.length != 1)
+            {
+                alert("Düzenlemek için 1 kitap seç");
+                return;
+            }
+
+            let id = secilen[0];
+            let k = kitaplar.find(x => String(x.bookID) == String(id));
+
+            if(!k)
+            {
+                alert("Kitap bulunamadı");
+                return;
+            }
+
+            editBookID.value = k.bookID;
+            editBookName.value = k.bookName;
+            editStock.value = k.stock;
+
+            yazarYayinciKategoriYukleEdit().then(() => 
+            {
+
+                [...editAuthorID.options].forEach(o => {
+                    if (o.text == k.authorName) 
+                    {
+                        editAuthorID.value = o.value;
+                    }
+                });
+
+                [...editPublisherID.options].forEach(o => {
+                    if (o.text == k.publisher) 
+                    {
+                        editPublisherID.value = o.value;
+                    }
+                });
+
+                [...editCategoryID.options].forEach(o => {
+                    if (o.text == k.categoryName) 
+                    {
+                        editCategoryID.value = o.value;
+                    }
+                });
+
+            });
+            
+            editModalBg.style.display = "flex";
+        }
+
+        function kaydet()
+        {
+            let url = bookID.value ? "/kitapDuzenleme" : "/kitapEkle";
+
+            fetch(url,{
+                method:"POST",
+                headers:{ "Content-Type":"application/json" },
+                credentials: 'include',
+                body:JSON.stringify({
+                    bookID: bookID.value,
+                    bookName: bookName.value,
+                    authorID: authorID.value,
+                    publisherID: publisherID.value,
+                    categoryID: categoryID.value,
+                    stock: stock.value
+                })
+            }).then(()=>{
+                modalKapat();
+                yukle();
+            });
+        }
+
+        function duzenleKaydet()
+        {
+            fetch("/kitapDuzenleme",{
+                method:"POST",
+                headers:{ "Content-Type":"application/json" },
+                body:JSON.stringify({
+                    bookID: editBookID.value,
+                    bookName: editBookName.value,
+                    authorID: editAuthorID.value,
+                    publisherID: editPublisherID.value,
+                    categoryID: editCategoryID.value,
+                    stock: editStock.value
+                })
+            }).then(()=>{
+                editModalKapat();
+                secilen = [];
+                yukle();
+            });
+        }
+
+        function sil()
+        {
+            if(secilen.length == 0)
+            {
+                alert("Kitap seç");
+                return;
+            }
+
+            fetch("/kitapSilme", {
+                method: "POST",
+                headers: { "Content-Type":"application/json" },
+                body: JSON.stringify({ ids: secilen })
+            })
+            .then(r => r.json())
+            .then(d => {
+                if(d.error)
+                {
+                    alert(d.error);
+                    return;
+                }
+                secilen = [];
+                yukle();
+            });
+        }
+
+        function yazarYayinciKategoriYukle()
+        {
+            return Promise.all([
+                fetch("/admin/yazarlar", { credentials: 'include' })
+                .then(r=>r.json())
+                .then(d=>{
+                    authorID.innerHTML = `<option value="">Yazar Seç</option>`;
+                    d.forEach(a=>{
+                        authorID.innerHTML += `<option value="${a.authorID}">${a.authorName}</option>`;
+                    });
+                }),
+
+                fetch("/yayincilar", { credentials: 'include' })
+                .then(r=>r.json())
+                .then(d=>{
+                    publisherID.innerHTML = `<option value="">Yayın Evi Seç</option>`;
+                    d.forEach(p=>{
+                        publisherID.innerHTML += `<option value="${p.publisherID}">${p.publisherName}</option>`;
+                    });
+                }),
+
+                fetch("/admin/kategoriler", { credentials: 'include' })
+                .then(r=>r.json())
+                .then(d=>{
+                    categoryID.innerHTML = `<option value="">Kategori Seç</option>`;
+                    d.forEach(c=>{
+                        categoryID.innerHTML += `<option value="${c.categoryID}">${c.categoryName}</option>`;
+                    });
+                })
+            ]);
+        }
+
+        function yazarYayinciKategoriYukleEdit(seciliYazarID, seciliYayinciID, seciliKategoriID)
+        {
+            return Promise.all([
+                fetch("/admin/yazarlar", { credentials: 'include' })
+                .then(r => r.json())
+                .then(d => {
+                    editAuthorID.innerHTML = "";
+                    d.forEach(a => {
+                        let selected = String(a.authorID) === String(seciliYazarID) ? "selected" : "";
+                        editAuthorID.innerHTML += `
+                            <option value="${a.authorID}" ${selected}>
+                                ${a.authorName}
+                            </option>
+                        `;
+                    });
+                }),
+
+                fetch("/yayincilar", { credentials: 'include' })
+                .then(r => r.json())
+                .then(d => {
+                    editPublisherID.innerHTML = "";
+                    d.forEach(p => {
+                        let selected = String(p.publisherID) === String(seciliYayinciID) ? "selected" : "";
+                        editPublisherID.innerHTML += `
+                            <option value="${p.publisherID}" ${selected}>
+                                ${p.publisherName}
+                            </option>
+                        `;
+                    });
+                }),
+
+                fetch("/admin/kategoriler", { credentials: 'include' })
+                .then(r => r.json())
+                .then(d => {
+                    editCategoryID.innerHTML = "";
+                    d.forEach(c => {
+                        let selected = String(c.categoryID) === String(seciliKategoriID) ? "selected" : "";
+                        editCategoryID.innerHTML += `
+                            <option value="${c.categoryID}" ${selected}>
+                                ${c.categoryName}
+                            </option>
+                        `;
+                    });
+                })
+            ]);
+        }
+
+        function modalKapat()
+        {
+            modalBg.style.display = "none";
+        }
+
+        function editModalKapat()
+        {
+            editModalBg.style.display = "none";
+        }
+
+        window.onload = ()=>{
+            kitapTablosu = document.getElementById("kitapTablosu");
+            prevBtn = document.getElementById("prevBtn");
+            nextBtn = document.getElementById("nextBtn");
+            arama = document.getElementById("arama");
+
+            modalBg = document.getElementById("modalBg");
+            modalTitle = document.getElementById("modalTitle");
+            bookID = document.getElementById("bookID");
+            bookName = document.getElementById("bookName");
+            authorID = document.getElementById("authorID");
+            publisherID = document.getElementById("publisherID");
+            categoryID = document.getElementById("categoryID");
+            stock = document.getElementById("stock");
+
+            editModalBg = document.getElementById("editModalBg");
+            editBookID = document.getElementById("editBookID");
+            editBookName = document.getElementById("editBookName");
+            editAuthorID = document.getElementById("editAuthorID");
+            editPublisherID = document.getElementById("editPublisherID");
+            editCategoryID = document.getElementById("editCategoryID");
+            editStock = document.getElementById("editStock");
+
+            prevBtn.onclick = ()=>{
+                if(sayfa > 0)
+                {
+                    sayfa--;
+                    tablo();
+                }
+            };
+
+            nextBtn.onclick = ()=>{
+                if((sayfa + 1) * LIMIT < filtre.length)
+                {
+                    sayfa++;
+                    tablo();
+                }
+            };
+
+            yukle();
+            yazarYayinciKategoriYukle();
+        };
+    </script>
+</body>
+</html>
