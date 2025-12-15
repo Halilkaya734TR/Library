@@ -1,8 +1,8 @@
 class Book:
-    def __init__(self, id, name, author, publisher, category, pageNumber):
-        self.id = id
-        self.name = name
-        self.author = author
-        self.publisher = publisher
-        self.category = category
-        self.pageNumber = pageNumber
+    def __init__(self, bookID, bookName, authorName, categoryName, publisherName, stock):
+        self.bookID = bookID
+        self.bookName = bookName
+        self.authorName = authorName
+        self.categoryName = categoryName
+        self.publisherName = publisherName
+        self.stock = stock

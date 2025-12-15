@@ -2,6 +2,9 @@ from flask import Flask
 from routes.userRoutes import userBp
 from routes.bookRoutes import bookBp
 from routes.adminRoutes import adminBp
+from routes.authorRoutes import authorBp
+from routes.categoryRoutes import categoryBp
+from routes.publishesRoutes import publisherBp
 from flask_jwt_extended import JWTManager
 
 app=Flask(__name__)
@@ -16,6 +19,9 @@ jwt = JWTManager(app)
 app.register_blueprint(userBp)
 app.register_blueprint(adminBp)
 app.register_blueprint(bookBp)
+app.register_blueprint(authorBp)
+app.register_blueprint(categoryBp)
+app.register_blueprint(publisherBp)
 
 if __name__ == "__main__":
     app.run(debug=True)

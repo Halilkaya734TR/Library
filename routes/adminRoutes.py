@@ -33,7 +33,27 @@ def adminLogin():
 @adminBp.route("/admin")
 @jwt_required()
 def admin():
-    return render_template("admin.html")
+    return render_template("admin.html", admin=session.get("adminName"))
+
+@adminBp.route("/kitapİslemler")
+@jwt_required()
+def kitapİslemler():
+    return render_template("kitapİslemler.html")
+
+@adminBp.route("/yazarlar")
+@jwt_required()
+def yazarlar():
+    return render_template("yazarlar.html")
+
+@adminBp.route("/kategoriler")
+@jwt_required()
+def kategoriler():
+    return render_template("kategoriler.html")
+
+@adminBp.route("/yayinevi")
+@jwt_required()
+def yayinevi():
+    return render_template("yayinevi.html")
  
 @adminBp.route("/logout")
 def logout():

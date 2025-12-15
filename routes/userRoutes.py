@@ -11,18 +11,18 @@ def index():
 
 @userBp.route("/userLogin", methods=["POST"])
 def userLogin():
-    mail = request.form.get("mail")
-    sifre = request.form.get("sifre")
+    email = request.form.get("email")
+    password = request.form.get("password")
 
-    user = UserService.login(mail, sifre)
+    user = UserService.login(email, password)
 
     if not user:
         flash("Girilen bilgiler uyuşmuyor!", "danger")
         return redirect(url_for("user.index"))
     
-    token = create_access_token(identity=str(user.id))
-    session["userId"] = user.id
-    session["userName"] = user.name
+    token = create_access_token(identity=str(user.memberID))
+    session["userId"] = user.memberID
+    session["userName"] = user.username
     
     response = redirect(url_for("user.member"))
     set_access_cookies(response, token)
@@ -33,20 +33,25 @@ def userLogin():
 @userBp.route("/member")
 @jwt_required()
 def member():
-    return render_template("member.html")
+    return render_template("member.html", username=session.get("userName"))
 
 @userBp.route("/kitaplar-sayfasi")
 @jwt_required()
 def kitaplarSayfasi():
     return render_template("kitaplar.html")
 
+@userBp.route("/kitaplarim")
+@jwt_required()
+def kitaplarim():
+    return render_template("kitaplarim.html")
+
 @userBp.route("/register", methods=["POST"])
 def register():
-    name = request.form.get("yeniKullanici")
+    username = request.form.get("username")
     email = request.form.get("email")
-    sifre= request.form.get("yeniSifre")
+    password= request.form.get("password")
 
-    sonuc = UserService.register(name, email, sifre)
+    sonuc = UserService.register(username, email, password)
     if sonuc == "Mail Var":
         flash("Bu mail zaten kayıtlı!", "danger")
         return redirect(url_for("user.index"))
