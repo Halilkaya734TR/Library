@@ -197,6 +197,7 @@
         <button onclick="window.location.href='{{url_for('admin.yazarlar')}}'">✍️ Yazar İşlemleri</button>
         <button onclick="window.location.href='{{url_for('admin.kategoriler')}}'">📂 Kategori İşlemleri</button>
         <button onclick="window.location.href='{{url_for('admin.yayinevi')}}'">📖 Yayınevi İşlemleri</button>
+        <button onclick="window.location.href='{{url_for('admin.adminInfo')}}'">⚙️ Hesap Bilgileri</button>
         <button class="logout" onclick="window.location.href='{{url_for('admin.logout')}}'">🚪 Çıkış</button>
     </div>
 
@@ -299,7 +300,7 @@
             h += `</tbody></table>`;
             yazarTablosu.innerHTML = h;
 
-            prevBtn.disabled = (sayfa === 0);
+            prevBtn.disabled = (sayfa == 0);
             nextBtn.disabled = (e >= filtre.length);
         }
 
@@ -313,7 +314,7 @@
             }
             else
             {
-                secilen = secilen.filter(x=>x!==id);
+                secilen = secilen.filter(x=>x!=id);
             }
         }
 
@@ -335,14 +336,14 @@
 
         function duzenleModal()
         {
-            if(secilen.length !== 1)
+            if(secilen.length != 1)
             {
                 alert("Düzenlemek için 1 yazar seçin");
                 return;
             }
 
             let id = secilen[0];
-            let y = yazarlar.find(x => String(x.authorID) === String(id));
+            let y = yazarlar.find(x => String(x.authorID) == String(id));
 
             if(!y)
             {
@@ -389,7 +390,7 @@
 
         function sil()
         {
-            if(secilen.length === 0)
+            if(secilen.length == 0)
             {
                 alert("Yazar seçin");
                 return;

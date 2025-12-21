@@ -197,6 +197,36 @@
         </div>
     </div>
     <script>
+    function sha256Hex(str)
+    {
+        const enc = new TextEncoder();
+        const data = enc.encode(str);
+        return crypto.subtle.digest('SHA-256', data).then(function(hashBuffer)
+        {
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+        });
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', function(e)
+    {
+        var form = this;
+        var pwFields = form.querySelectorAll('input[type="password"]');
+        var promises = [];
+        pwFields.forEach(function(f)
+        {
+            if(f.value)
+            {
+                promises.push(sha256Hex(f.value).then(function(h){ f.value = h; }));
+            }
+        });
+        if(promises.length > 0)
+        {
+            e.preventDefault();
+            Promise.all(promises).then(function(){ form.submit(); });
+        }
+    });
+
     function showForm(type)
     {
         let formContent = document.getElementById("formContent");

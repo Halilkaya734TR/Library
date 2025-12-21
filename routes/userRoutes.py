@@ -1,5 +1,7 @@
-from flask import Blueprint, request, session, redirect, url_for, flash, render_template
+from flask import Blueprint, request, session, redirect, url_for, flash, render_template, jsonify
 from services.userService import UserService
+from repository.userRepository import UserRepository
+from repository.userLogRepository import UserLogRepository
 from flask_jwt_extended import create_access_token, jwt_required, unset_jwt_cookies, set_access_cookies
 
 
@@ -11,22 +13,37 @@ def index():
 
 @userBp.route("/userLogin", methods=["POST"])
 def userLogin():
-    email = request.form.get("email")
-    password = request.form.get("password")
+    email = request.form.get("email") or request.args.get("email")
+    password = request.form.get("password") or request.args.get("password")
 
     user = UserService.login(email, password)
-
     if not user:
+        if request.accept_mimetypes.best == "application/json":
+            return jsonify(msg="Hatalı giriş"), 401
+
         flash("Girilen bilgiler uyuşmuyor!", "danger")
         return redirect(url_for("user.index"))
-    
+
     token = create_access_token(identity=str(user.memberID))
-    session["userId"] = user.memberID
-    session["userName"] = user.username
-    
+
+    if request.accept_mimetypes.best == "application/json":
+        response = jsonify(
+            success=True,
+            message="Giriş başarılı",
+            user={
+                "id": user.memberID,
+                "username": user.username
+            }
+        )
+        set_access_cookies(response, token)
+        return response
+
     response = redirect(url_for("user.member"))
     set_access_cookies(response, token)
-    
+
+    session["userID"] = user.memberID
+    session["userName"]= user.username
+
     flash("Giriş Başarılı!", "success")
     return response
 
@@ -58,6 +75,89 @@ def register():
     
     flash("Kayıt başarılı! Giriş yapabilirsiniz!", "success")
     return redirect(url_for("user.index"))
+
+
+@userBp.route("/memberInfo")
+@jwt_required()
+def memberInfo():
+    memberID = session.get("userID")
+    member = None
+    if memberID:
+        memberObj = UserRepository.getUserById(memberID)
+        if memberObj:
+            member = {"username": memberObj.username, "email": memberObj.email}
+    return render_template("memberInfo.html", member=member)
+
+
+@userBp.route("/islemGecmisi")
+@jwt_required()
+def islemGecmisi():
+    return render_template("userLog.html")
+
+
+@userBp.route("/userLogs")
+@jwt_required()
+def getUserLogs():
+    memberID = session.get('userID')
+    rows = UserLogRepository.getAll(memberID)
+    return jsonify(rows)
+
+
+@userBp.route('/kullaniciProfilGuncelle', methods=['POST'])
+@jwt_required()
+def kullaniciProfilGuncelle():
+    data = request.get_json()
+    memberID = session.get('userID')
+    if not memberID:
+        return jsonify({"success": False, "message": "Yetkisiz"}), 401
+
+    username = data.get('username')
+    email = data.get('email')
+    UserRepository.updateMember(memberID, username, email)
+    UserLogRepository.updateUsername(memberID, username)
+    session['userName'] = username
+    return jsonify({"success": True, "message": "Profil güncellendi"})
+
+
+@userBp.route('/kullaniciSifreDegistir', methods=['POST'])
+@jwt_required()
+def kullaniciSifreDegistir():
+    data = request.get_json()
+    memberID = session.get('userID')
+    if not memberID:
+        return jsonify({"success": False, "message": "Yetkisiz"}), 401
+
+    old_password = data.get('old_password')
+    new_password = data.get('new_password')
+    new_password_confirm = data.get('new_password_confirm')
+    if new_password != new_password_confirm:
+        return jsonify({"success": False, "message": "Yeni şifreler eşleşmiyor"}), 400
+
+    ok, msg = UserRepository.changePassword(memberID, old_password, new_password)
+    if not ok:
+        return jsonify({"success": False, "message": msg}), 400
+
+    return jsonify({"success": True, "message": msg})
+
+
+@userBp.route('/kullaniciSil', methods=['POST'])
+@jwt_required()
+def kullaniciSil():
+    data = request.get_json()
+    memberID = session.get('userID')
+    if not memberID:
+        return jsonify({"success": False, "message": "Yetkisiz"}), 401
+
+    password = data.get('password')
+    ok, msg = UserService.deleteUser(memberID, password)
+    if not ok:
+        return jsonify({"success": False, "message": msg}), 400
+
+    response = jsonify({"success": True, "message": msg})
+    unset_jwt_cookies(response)
+    session.pop('userID', None)
+    session.pop('userName', None)
+    return response
 
 
 @userBp.route("/logout")

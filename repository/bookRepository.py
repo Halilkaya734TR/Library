@@ -94,3 +94,16 @@ class BookRepository:
         con.commit()
         cur.close()
         con.close()
+
+    @staticmethod
+    def getBookNameByID(bookID):
+        con = getConnection()
+        cur = con.cursor(dictionary=True)
+        cur.execute("SELECT bookName FROM books WHERE bookID=%s", (bookID,))
+        row = cur.fetchone()
+        cur.close()
+        con.close()
+
+        if row:
+            return row["bookName"]
+        return None

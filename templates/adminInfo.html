@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="tr">
+    <head>
+        <meta charset="UTF-8">
+        <title>Hesap Bilgileri</title>
+        <style>
+            body
+            {
+                margin:0;
+                height:100vh;
+                display:flex;
+                font-family:Segoe UI, sans-serif;
+                background:#f3f4f6;
+            }
+
+            .sidebar
+            {
+                width:220px;
+                background:#1f2933;
+                color:white;
+                padding:20px;
+            }
+
+            .sidebar h2
+            {
+                text-align:center;
+                margin-bottom:30px;
+            }
+            
+            .sidebar button
+            {
+                width:100%;
+                padding:12px;
+                margin:8px 0;
+                background:none;
+                border:none;
+                color:white;
+                text-align:left;
+                cursor:pointer;
+                border-radius:8px;
+            }
+
+            .sidebar button:hover
+            {
+                background:#374151;
+            }
+
+            .logout
+            {
+                background:#b91c1c !important;
+            }
+
+            .content
+            {
+                flex:1;
+                display:flex;
+                justify-content:center;
+                align-items:center;
+            }
+
+            .panel
+            {
+                background:white;
+                padding:35px;
+                width:420px;
+                border-radius:18px;
+                box-shadow:0 10px 25px rgba(0,0,0,.15);
+            }
+
+            .form-group
+            {
+                margin-bottom:14px;
+            }
+
+            label
+            {
+                font-weight:600;
+                font-size:14px;
+            }
+
+            input
+            {
+                width:100%;
+                padding:10px;
+                border-radius:10px;
+                border:1px solid #d1d5db;
+            }
+
+            .btn
+            {
+                width:100%;
+                padding:11px;
+                border:none;
+                border-radius:10px;
+                font-weight:600;
+                cursor:pointer;
+                margin-top:10px;
+            }
+
+            .btn-primary
+            {
+                background:#2563eb;
+                color:white;
+            }
+
+            .btn-secondary
+            {
+                background:#374151;
+                color:white;
+            }
+
+            .btn-danger
+            {
+                background:#b91c1c;
+                color:white;
+            }
+
+            .divider
+            {
+                height:1px;
+                background:#e5e7eb;
+                margin:20px 0;
+            }
+
+            .modal-bg
+            {
+                position:fixed;
+                inset:0;
+                background:rgba(0,0,0,.6);
+                display:none;
+                justify-content:center;
+                align-items:center;
+                z-index:1000;
+            }
+
+            .modal
+            {
+                background:white;
+                padding:30px;
+                width:360px;
+                border-radius:16px;
+                box-shadow:0 15px 30px rgba(0,0,0,.3);
+            }
+
+            .modal h4
+            {
+                margin-top:0;
+            }
+
+            .modal-actions
+            {
+                display:flex;
+                gap:10px;
+                margin-top:18px;
+            }
+
+            .modal-actions button
+            {
+                flex:1;
+            }
+
+        </style>
+    </head>
+    <body>
+        <div class="sidebar">
+            <h2>Admin Paneli</h2>
+            <button onclick="window.location.href='{{url_for('admin.kitapİslemler')}}'">📚 Kitap İşlemleri</button>
+            <button onclick="window.location.href='{{url_for('admin.yazarlar')}}'">✍️ Yazar İşlemleri</button>
+            <button onclick="window.location.href='{{url_for('admin.kategoriler')}}'">🗂️ Kategori İşlemleri</button>
+            <button onclick="window.location.href='{{url_for('admin.yayinevi')}}'">📖 Yayınevi İşlemleri</button>
+            <button onclick="window.location.href='{{url_for('admin.adminInfo')}}'">⚙️ Hesap Bilgileri</button>
+            <button class="logout" onclick="window.location.href='{{url_for('admin.logout')}}'">🚪 Çıkış</button>
+        </div>
+
+        <div class="content">
+            <div class="panel">
+                <h3>⚙️ Hesap Bilgileri</h3>
+                <div class="form-group">
+                    <label>Kullanıcı Adı</label>
+                    <input id="username" value="{{ admin.username }}">
+                </div>
+                <div class="form-group">
+                    <label>E-posta</label>
+                    <input id="email" value="{{ admin.email }}">
+                </div>
+
+                <button class="btn btn-primary" onclick="saveProfile()">Kaydet</button>
+
+                <div class="divider"></div>
+                <button class="btn btn-secondary" onclick="openPassword()">🔒 Şifre Değiştir</button>
+                <button class="btn btn-danger" onclick="openDelete()">⚠️ Hesabı Sil</button>
+
+            </div>
+        </div>
+        <div class="modal-bg" id="passwordModal">
+            <div class="modal">
+                <h4>Şifre Değiştir</h4>
+                <input type="password" id="oldPass" placeholder="Eski şifre">
+                <input type="password" id="newPass" placeholder="Yeni şifre">
+                <input type="password" id="newPass2" placeholder="Yeni şifre (tekrar)">
+
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" onclick="closeModals()">İptal</button>
+                    <button class="btn btn-primary" onclick="changePassword()">Güncelle</button>
+                </div>
+            </div>
+        </div>
+        <div class="modal-bg" id="deleteModal">
+            <div class="modal">
+                <h4>Hesabı Sil</h4>
+                <p style="font-size:14px;color:#6b7280">
+                Bu işlem geri alınamaz.
+                </p>
+                <input type="password" id="deletePass" placeholder="Şifre">
+
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" onclick="closeModals()">İptal</button>
+                    <button class="btn btn-danger" onclick="deleteAccount()">Sil</button>
+                </div>
+            </div>
+        </div>
+        <script>
+            function openPassword()
+            {
+                document.getElementById("passwordModal").style.display="flex";
+            }
+
+            function openDelete()
+            {
+                document.getElementById("deleteModal").style.display="flex";
+            }
+
+            function closeModals()
+            {
+                document.querySelectorAll(".modal-bg").forEach(m=>m.style.display="none");
+            }
+
+            function sha256Hex(str)
+            {
+                const enc = new TextEncoder();
+                const data = enc.encode(str);
+                return crypto.subtle.digest('SHA-256', data).then(function(hashBuffer)
+                {
+                    const hashArray = Array.from(new Uint8Array(hashBuffer));
+                    return hashArray.map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+                });
+            }
+
+            function changePassword()
+            {
+                const oldP = oldPass.value;
+                const newP = newPass.value;
+                const newP2 = newPass2.value;
+
+                function doChange()
+                {
+                    var p1 = oldP ? sha256Hex(oldP) : Promise.resolve("");
+                    var p2 = newP ? sha256Hex(newP) : Promise.resolve("");
+                    var p3 = newP2 ? sha256Hex(newP2) : Promise.resolve("");
+                    return Promise.all([p1,p2,p3]).then(function(vals)
+                    {
+                        var oldH = vals[0], newH = vals[1], newH2 = vals[2];
+                        return fetch("/adminSifreDegistir",{
+                            method:"POST",
+                            headers:{"Content-Type":"application/json"},
+                            credentials: 'include',
+                            body:JSON.stringify({
+                                old_password: oldH,
+                                new_password: newH,
+                                new_password_confirm: newH2
+                            })
+                        });
+                    });
+                }
+
+                doChange()
+                .then(function(res){
+                    return res.json();
+                })
+                .then(function(data){
+                    alert(data.message);
+                    if(data.success)
+                    {
+                        closeModals();
+                    }
+                })
+                .catch(function(err){
+                    console.error(err);
+                    alert("Bir hata oluştu");
+                });
+            }
+
+            function deleteAccount()
+            {
+                if(!confirm("Emin misiniz?")) 
+                {
+                    return;
+                }
+
+                var q = deletePass.value ? sha256Hex(deletePass.value) : Promise.resolve("");
+                q.then(function(p){
+                    return fetch("/adminSil",{
+                        method:"POST",
+                        headers:{"Content-Type":"application/json"},
+                        credentials: 'include',
+                        body:JSON.stringify({ password: p })
+                    });
+                })
+                .then(function(res){
+                    return res.json();
+                })
+                .then(function(data)
+                {
+                    if(data.success)
+                    {
+                        window.location.href = "/";
+                    }
+                    else
+                    {
+                        alert(data.message);
+                    }
+                })
+                .catch(function(err){
+                    console.error(err);
+                    alert("Bir hata oluştu");
+                });
+            }
+
+            function saveProfile()
+            {
+                fetch("/adminProfilGuncelle",
+                {
+                    method:"POST",
+                    headers:{"Content-Type":"application/json"},
+                    credentials: 'include',
+                    body:JSON.stringify({
+                        username: document.querySelector("#username").value,
+                        email: document.querySelector("#email").value
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    alert(data.message);
+                });
+            }
+        </script>
+    </body>
+</html>

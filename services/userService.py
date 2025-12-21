@@ -20,3 +20,7 @@ class UserService:
         UserRepository.createUser(username, email, hashed)
 
         return "OK"
+
+    @staticmethod
+    def deleteUser(memberID, password):
+        return UserRepository.deleteUser(memberID, password)
