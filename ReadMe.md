@@ -1,9 +1,12 @@
 # <center>Kütüphane Ödevi(Yapım Aşamasında)</center>
 
-## Yenilikler (15.12.25) (Büyük Güncelleme)
-- Yeni bi tasarıma geçildi. Sol tarafta panel sağ tarafta sayfa gözükecek bi tasarım yaptım.
-- Üye tarafında ana sayfa, kitaplar da ödünç alma işlevi kitaplarım adında kullanıma hazır bi yer yapıldı. Ödünç alınan kitapları detaylarını ve iade edebiliyorsunuz.
-- Admin tarafında epey yenilikler var. Ana sayfa, kitap, kategori, yazar ve yayınevi işlemleri yapıldı. Kitap, kategori, yazar ve yayınevleri eklenebilir, düzenlenebilir ve silinebilir. Tabi silinmeden önce ödünç alınmışsa silmiyor.
+## Yenilikler (21.12.25)
+- Üye tarafında Hesap bilgisi ve işlem geçmişi eklendi!
+- Admin tarafında ise sadece Hesap Bilgisi eklendi. Log tarafı yapmadan önce commit atmak istedim.
+- Hesap bilgisinde üye bilgilerini değiştirebilir, şifresini değiştirebilir (Eski şifre soruyor ilk). Hesabını silebilir. Eğer iade edilmemiş kitap varsa hesap silinmiyor ve uyarı geliyor kitap iadesi için.
+- İşlem geçmişinde kullanıcının önceden yaptığı işlemler loglar halinde kullanıcı gözükür. Kullanıcı hesabını silse bile verileri tabloda verilerde sorun yaşamadan hala tutulur.
+- Artık frontend hashlenip backendte şifreleniyor.
+- Postman de kullanıcı ve admin girişinde çerezlerde token gözükmeme sorunu çözüldü.
 
 
 ## İçindekiler
@@ -36,6 +39,14 @@
 ### Kitaplarım Sayfası:
 ![kitaplarım](Resimler/kitaplarım.png)
 - Ödünç alınan kitapları gösterir. Kitaplar hakkında bilgileri görebilir ve iade edebilirsiniz. İade edildiğinde stokta kitap sayısı artar.
+
+### İşlem Geçmişi Sayfası:
+![işlem-geçmişi](Resimler/işlem%20geçmisi.png)
+- Kullanıcı işlem geçmişi sayfasından önceden yapmış olduğu işlemleri (loglara) bakabilir. Loglar apayrı bi tabloda tutulur. Kullanıcı hesabını silse bile log tablosunda veri kaybı olmadan bilgiler kalır.
+
+### Hesap Bilgisi Sayfası:
+![hesap-bilgisi](Resimler/hesap%20bilgileri.png)
+- Kullanıcı kendi hesap bilgilerini görebilir, kullanıcı ismini, emailini ve şifresini değiştirebilir. Ve hatta hesabı silebilir. Eğer hesapta iade edilmemiş kitap varsa önce iadesi istenir. Ceza sistemi entegre edince ceza varsa da izin vermeyecek. İsim değişikliğinde logdaki isim de otomatik değişir. Ve loga bilgi gider.
 
 ### Admin Panel Sayfası:
 ![admin-panel](Resimler/admin%20panel.png)
@@ -95,4 +106,4 @@
 
 ## Kapanış
 
-- Üye sayfasına üye bilgilerini değiştirme, üye işlem geçmişi, admin sayfasına ise admin bilgileri değiştirme, genel log, mail gönderme eklemeyi düşünüyorum. Ama bugün değil. Bi sonraki commit dediklerimi bir çoğunu yapmış olurum.
+- Bi sonraki committe admin log sayfası, admin mail gönderme ve ceza sayfası yapılacaktır. Son commitlere yaklaştık sayılır.
