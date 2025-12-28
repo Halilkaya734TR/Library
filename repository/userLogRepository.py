@@ -67,3 +67,41 @@ class UserLogRepository:
 
             row["logMessage"] = message
         return rows
+    
+    @staticmethod
+    def getAllLogs():
+        con = getConnection()
+        cur = con.cursor(dictionary=True)
+
+        cur.execute("""
+            SELECT
+                ul.userID,
+                ul.username,
+                ul.logDate,
+                lm.messageTemplate,
+                ul.logParams
+            FROM userLog ul
+            LEFT JOIN logMessages lm ON ul.logID = lm.logID
+            ORDER BY ul.logDate DESC
+        """)
+
+        rows = cur.fetchall()
+        cur.close()
+        con.close()
+
+        for row in rows:
+            message = row["messageTemplate"] or "İşlem"
+
+            if row["logParams"]:
+                try:
+                    params = row["logParams"]
+                    if isinstance(params, str):
+                        params = json.loads(params)
+                    if isinstance(params, dict):
+                        for key, value in params.items():
+                            message = message.replace(f"{{{key}}}", str(value))
+                except:
+                    pass
+
+            row["logMessage"] = message
+        return rows

@@ -124,7 +124,7 @@
         <h2>Üye Paneli</h2>
         <button onclick="window.location.href='{{ url_for('user.kitaplarSayfasi') }}'">📚 Kitaplar</button>
         <button onclick="window.location.href='{{ url_for('user.kitaplarim') }}'">📖 Kitaplarım</button>
-        <button>⚠️ Ceza Bilgi</button>
+        <button onclick="window.location.href='{{url_for('user.cezalarim')}}'">⚠️ Ceza Bilgi</button>
         <button onclick="window.location.href='{{ url_for('user.islemGecmisi') }}'">🧾 İşlem Geçmişi</button>
         <button onclick="window.location.href='{{ url_for('user.memberInfo') }}'">⚙️ Hesap Bilgileri</button>
         <button class="logout" onclick="window.location.href='{{url_for('user.logout')}}'">🚪 Çıkış</button>
@@ -152,7 +152,8 @@
             let data = await res.json();
             if(!Array.isArray(data)) data = [];
 
-            if(data.length == 0){
+            if(data.length == 0)
+            {
                 panel.innerHTML = '<p class="message">Kayıt bulunamadı.</p>';
                 return;
             }

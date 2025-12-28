@@ -5,6 +5,7 @@ from routes.adminRoutes import adminBp
 from routes.authorRoutes import authorBp
 from routes.categoryRoutes import categoryBp
 from routes.publishesRoutes import publisherBp
+from routes.delayFineRoutes import delayFineBp
 from flask_jwt_extended import JWTManager
 
 app=Flask(__name__)
@@ -24,6 +25,7 @@ app.register_blueprint(bookBp)
 app.register_blueprint(authorBp)
 app.register_blueprint(categoryBp)
 app.register_blueprint(publisherBp)
+app.register_blueprint(delayFineBp)
 
 if __name__ == "__main__":
     app.run(debug=True)

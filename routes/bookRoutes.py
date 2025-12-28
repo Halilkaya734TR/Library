@@ -1,11 +1,13 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from repository.adminLogRepository import AdminLogRepository
+from repository.adminRepository import AdminRepository
+from datetime import datetime
 from services.bookService import BookService
 from services.borrowService import BorrowService
 from repository.loanRepository import LoanRepository
-from services.authorService import AuthorService
-from services.publisherService import PublisherService
-from services.categoryService import CategoryService
+from services.delayFineService import delayFineService
+
 
 
 bookBp = Blueprint("book", __name__)
@@ -38,7 +40,11 @@ def oduncAl():
 
     if len(bookIDs) == 0:
         return jsonify({"error": "Kitap seçilmedi."}), 400
-
+    
+    activeFineCount = delayFineService.countActiveFine(memberID)
+    if activeFineCount > 0:
+        return jsonify({"error": "Aktif cezanız bulunduğu için ödünç alma işlemi yapılamaz!"}), 403
+    
     current = LoanRepository.countActiveLoans(memberID)
 
     if current + len(bookIDs) > 3:
@@ -87,29 +93,45 @@ def kitap_sayim():
 @bookBp.route("/kitapEkle", methods=["POST"])
 @jwt_required()
 def kitapEkle():
-    BookService.addBook(request.get_json())
+    data = request.get_json()
+    BookService.addBook(data)
+    try:
+        admin_id = get_jwt_identity()
+        admin = AdminRepository.getAdminById(admin_id)
+        AdminLogRepository.saveParams(admin_id, admin.name, 7, datetime.now(), {"bookName": data.get("bookName")})
+    except Exception:
+        pass
+
     return jsonify({"message": "Kitap başarıyla eklendi!"})
 
 @bookBp.route("/kitapDuzenleme", methods=["POST"])
 @jwt_required()
 def kitapDuzenleme():
-    BookService.editBook(request.get_json())
+    data = request.get_json()
+    BookService.editBook(data)
+    try:
+        admin_id = get_jwt_identity()
+        admin = AdminRepository.getAdminById(admin_id)
+        AdminLogRepository.saveParams(admin_id, admin.name, 8, datetime.now(), {"bookID": data.get("bookID"), "bookName": data.get("bookName")})
+    except Exception:
+        pass
+
     return jsonify({"message": "Seçilen kitap başarıyla düzenlendi!"})
 
 @bookBp.route("/kitapSilme", methods=["POST"])
 @jwt_required()
 def kitapSilme():
     try:
-        BookService.deleteBooks(request.get_json()["ids"])
+        ids = request.get_json()["ids"]
+        BookService.deleteBooks(ids)
+        try:
+            admin_id = get_jwt_identity()
+            admin = AdminRepository.getAdminById(admin_id)
+            AdminLogRepository.saveParams(admin_id, admin.name, 9, datetime.now(), {"deletedIDs": ids})
+        except Exception:
+            pass
+
         return jsonify({"message": "Kitaplar silindi"})
     except Exception:
         return jsonify({"error": "Ödünç alınmış kitap silinemez"}), 400
-
-@bookBp.route("/yayincilar")
-@jwt_required()
-def yayincilar():
-    publishers = PublisherService.getPublishers()
-    return jsonify([{
-        "publisherID": p.publisherID,
-        "publisherName": p.publisherName
-    } for p in publishers])
+    

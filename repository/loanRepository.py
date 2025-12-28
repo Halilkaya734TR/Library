@@ -1,4 +1,4 @@
-from datetime import date, timedelta, datetime
+from datetime import timedelta, datetime
 from config.db import getConnection
 from.userLogRepository import UserLogRepository
 from.userRepository import UserRepository
@@ -21,7 +21,9 @@ class LoanRepository:
     def insertLoan(memberID, bookID):
         con = getConnection()
         cur = con.cursor(dictionary = True)
-        cur.execute("INSERT INTO loan (memberID, bookID, loanDate, returnDate) VALUES (%s, %s, %s, %s)",(memberID, bookID, date.today(), (date.today() + timedelta(days=15))))
+        now = datetime.now()
+        due = now + timedelta(minutes=1)
+        cur.execute("INSERT INTO loan (memberID, bookID, loanDate, returnDate) VALUES (%s, %s, %s, %s)", (memberID, bookID, now, due))
         con.commit()
         cur.close()
         con.close()

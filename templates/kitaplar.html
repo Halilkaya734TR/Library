@@ -74,6 +74,7 @@
             box-shadow:0 6px 18px rgba(0,0,0,.15);
             overflow:auto;
         }
+
         table
         { 
             width:100%; border-collapse:collapse; 
@@ -162,7 +163,7 @@
         <h2>Üye Paneli</h2>
         <button onclick="window.location.href='{{url_for('user.kitaplarSayfasi')}}'">📚 Kitaplar</button>
         <button onclick="window.location.href='{{url_for('user.kitaplarim')}}'">📖 Kitaplarım</button>
-        <button>⚠️ Ceza Bilgi</button>
+        <button onclick="window.location.href='{{url_for('user.cezalarim')}}'">⚠️ Ceza Bilgi</button>
         <button onclick="window.location.href='{{ url_for('user.islemGecmisi') }}'">🧾 İşlem Geçmişi</button>
         <button onclick="window.location.href='{{url_for('user.memberInfo')}}'">⚙️ Hesap Bilgileri</button>
         <button class="logout" onclick="window.location.href='{{url_for('user.logout')}}'">🚪 Çıkış</button>
@@ -310,12 +311,20 @@
             {
                 method:"POST",
                 headers:{ "Content-Type":"application/json" },
+                credentials:"include",
                 body:JSON.stringify({ bookIDs: seciliKitaplar })
             })
-            .then(res=>res.json())
-            .then(data=>{
+            .then(async res => {
+                const data = await res.json();
+
+                if (!res.ok) 
+                {
+                    alert(data.error || "Bir hata oluştu");
+                    return;
+                }
+
                 alert(data.message);
-                seciliKitaplar=[];
+                seciliKitaplar = [];
                 kitaplariYukle();
             });
         });

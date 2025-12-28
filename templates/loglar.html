@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin | Loglar</title>
+  <style>
+    * 
+    { 
+      box-sizing: border-box; 
+    }
+
+    body
+    {
+      margin:0;
+      height:100vh;
+      display:flex;
+      font-family:Segoe UI, sans-serif;
+      background:#f3f4f6;
+    }
+
+    .sidebar
+    {
+      width:240px;
+      background:#111827;
+      color:white;
+      padding:20px;
+    }
+
+    .sidebar h2
+    {
+      text-align:center;
+      margin-bottom:25px;
+    }
+
+    .sidebar button
+    {
+      width:100%;
+      padding:12px;
+      margin:6px 0;
+      background:none;
+      border:none;
+      color:white;
+      text-align:left;
+      cursor:pointer;
+      border-radius:10px;
+    }
+
+    .sidebar button:hover
+    { 
+      background:#1f2937; 
+    }
+
+    .logout
+    { 
+      background:#991b1b !important; 
+    }
+
+    .content
+    {
+      flex:1;
+      padding:25px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      position:relative;
+    }
+
+    .page-title
+    {
+      font-size:26px;
+      margin:0;
+    }
+
+    .grid
+    {
+      flex:1;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:14px;
+      min-height:0;
+    }
+
+    .panel
+    {
+      display:flex;
+      flex-direction:column;
+      min-height:0;
+    }
+
+    .panel-head
+    {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:14px 16px;
+      background:white;
+      border-radius:16px;
+      box-shadow:0 4px 12px rgba(0,0,0,.15);
+    }
+
+    .panel-head .title
+    {
+      font-weight:700;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+
+    .panel-head .tools
+    {
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    input
+    {
+      height:42px;
+      padding:0 14px;
+      border-radius:10px;
+      border:1px solid #cbd5e1;
+      outline:none;
+    }
+
+    .btn
+    {
+      padding:10px 14px;
+      border:none;
+      border-radius:10px;
+      color:white;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      user-select:none;
+      white-space:nowrap;
+    }
+
+    .page-btn
+    { 
+      background:#2563eb; 
+    }
+
+    .page-btn:disabled
+    { 
+      background:#94a3b8; 
+      cursor:not-allowed; 
+    }
+
+    .table-box
+    {
+      margin-top:12px;
+      flex:1;
+      background:white;
+      border-radius:16px;
+      box-shadow:0 6px 18px rgba(0,0,0,.15);
+      overflow:auto;
+    }
+
+    table
+    {
+      width:100%;
+      border-collapse:collapse;
+    }
+
+    th,td
+    {
+      padding:12px 14px;
+      border-bottom:1px solid #e5e7eb;
+      vertical-align:top;
+    }
+
+    th
+    {
+      background:#2563eb;
+      color:white;
+      position:sticky;
+      top:0;
+      z-index:2;
+    }
+
+    tr:nth-child(even)
+    { 
+      background:#f9fafb; 
+    }
+
+    .muted{ color:#6b7280; font-size:13px; }
+
+    @media (max-width: 1100px)
+    {
+      .grid
+      { 
+        grid-template-columns: 1fr; 
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <h2>Admin Paneli</h2>
+    <button onclick="window.location.href='{{url_for('admin.kitapİslemler')}}'">📚 Kitap İşlemleri</button>
+    <button onclick="window.location.href='{{url_for('admin.yazarlar')}}'">✍️ Yazar İşlemleri</button>
+    <button onclick="window.location.href='{{url_for('admin.kategoriler')}}'">📂 Kategori İşlemleri</button>
+    <button onclick="window.location.href='{{url_for('admin.yayinevi')}}'">📖 Yayınevi İşlemleri</button>
+    <button onclick="window.location.href='{{url_for('admin.cezalar')}}'">⛔ Kütüphane Cezaları</button>
+    <button onclick="window.location.href='{{url_for('admin.kullanicilar')}}'">👤 Kullanıcılar</button>
+    <button onclick="window.location.href='{{url_for('admin.loglar')}}'">🧾 Kütüphane Logları</button>
+    <button onclick="window.location.href='{{url_for('admin.adminler')}}'">👨‍💼 Adminler</button>
+    <button onclick="window.location.href='{{url_for('admin.adminInfo')}}'">⚙️ Hesap Bilgileri</button>
+    <button class="logout" onclick="window.location.href='{{url_for('admin.logout')}}'">🚪 Çıkış</button>
+  </div>
+
+  <div class="content">
+    <h1 class="page-title">🧾 Loglar</h1>
+
+    <div class="grid">
+
+      <div class="panel" id="userPanel">
+        <div class="panel-head">
+          <div>
+            <div class="title">👤 User Log</div>
+            <div class="muted" id="userInfo">Yükleniyor...</div>
+          </div>
+
+          <div class="tools">
+            <button class="btn page-btn" id="userPrev" disabled>◀</button>
+            <button class="btn page-btn" id="userNext">▶</button>
+          </div>
+        </div>
+
+        <div class="table-box" id="userTableBox">
+          <p style="padding:20px">User loglar yükleniyor...</p>
+        </div>
+      </div>
+
+      <div class="panel" id="adminPanel">
+        <div class="panel-head">
+          <div>
+            <div class="title">🛡️ Admin Log</div>
+            <div class="muted" id="adminInfo">Yükleniyor...</div>
+          </div>
+
+          <div class="tools">
+            <button class="btn page-btn" id="adminPrev" disabled>◀</button>
+            <button class="btn page-btn" id="adminNext">▶</button>
+          </div>
+        </div>
+
+        <div class="table-box" id="adminTableBox">
+          <p style="padding:20px">Admin loglar yükleniyor...</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+    
+    <script>
+        const LIMIT = 10;
+
+        function safe(v)
+        { 
+          return v ?? ""; 
+        }
+
+        class LogPanel 
+        {
+          constructor(o)
+          {
+            Object.assign(this, o);
+            this.all=[]; this.filtered=[]; this.page=0;
+            this.prev.onclick = ()=>{ 
+              if(this.page>0)
+              {
+                this.page--;this.render();
+              }
+          };
+
+          this.next.onclick = ()=>{ 
+            if((this.page+1)*LIMIT < this.filtered.length)
+            {
+              this.page++;
+              this.render();
+            }};            }
+
+          async load()
+          {
+            try 
+            {
+              const r = await fetch(this.endpoint,{credentials:"include"});
+              if (!r.ok) throw new Error(`HTTP ${r.status}`);
+              this.all = await r.json();
+              this.filtered = [...this.all];
+              this.page = 0;
+              this.render();
+            } 
+            catch(e) 
+            {
+            console.error(`Hata (${this.endpoint}):`, e);
+              this.box.innerHTML = `<p style="padding:20px;color:red">Yükleme hatası: ${e.message}</p>`;
+            }
+          }
+
+          render()
+          {
+            const s = this.page * LIMIT;
+            const e = s + LIMIT;
+            const rows = this.filtered.slice(s,e);
+
+            let h = `<table><thead><tr>`;
+            this.columns.forEach(c=>h+=`<th>${c}</th>`);
+            h += `</tr></thead><tbody>`;
+
+            rows.forEach(r=>
+            {
+              const logDate = new Date(r[this.keys[3]]);
+              const formattedDate = isNaN(logDate) ? r[this.keys[3]] : logDate.toLocaleString('tr-TR');
+              h += `<tr>
+              <td>${safe(r[this.keys[0]])}</td>
+              <td>${safe(r[this.keys[1]])}</td>
+              <td>${safe(r[this.keys[2]])}</td>
+              <td class="muted">${formattedDate}</td>
+              </tr>`;
+            });
+
+            if(!rows.length)
+            {
+              h += `<tr><td colspan="4" style="padding:16px;color:#6b7280">Kayıt yok</td></tr>`;
+            }
+
+            h += `</tbody></table>`;
+            this.box.innerHTML = h;
+
+            const start = this.filtered.length === 0 ? 0 : s+1;
+            const end = Math.min(e, this.filtered.length);
+            this.info.textContent = `${start} - ${end} / ${this.filtered.length} kayıt`;
+
+            this.prev.disabled = this.page==0;
+            this.next.disabled = e>=this.filtered.length;
+          }
+        }
+
+        window.onload = ()=>{
+            const userLog = new LogPanel({
+            endpoint: "/admin/userLogs",
+            box: document.getElementById("userTableBox"),
+            prev: document.getElementById("userPrev"),
+            next: document.getElementById("userNext"),
+            info: document.getElementById("userInfo"),
+            columns: ["User ID","Username","Log Mesajı","Tarih"],
+            keys: ["userID","username","logMessage","logDate"]
+            });
+            
+            const adminLog = new LogPanel({
+            endpoint: "/admin/adminLogs",
+            box: document.getElementById("adminTableBox"),
+            prev: document.getElementById("adminPrev"),
+            next: document.getElementById("adminNext"),
+            info: document.getElementById("adminInfo"),
+            columns: ["Admin ID","Admin Adı","Log Mesajı","Tarih"],
+            keys: ["adminID","adminName","logMessage","logDate"]
+            });
+            
+            userLog.load();
+            adminLog.load(); 
+        };
+    </script>
+</body>
+</html>

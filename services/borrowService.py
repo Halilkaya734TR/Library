@@ -1,5 +1,6 @@
 from repository.loanRepository import LoanRepository
 from services.bookService import BookService
+from datetime import datetime, date
 
 class BorrowService:
     
@@ -26,13 +27,23 @@ class BorrowService:
             if not book:
                 continue
 
+            ld = loan["loanDate"]
+            rd = loan["returnDate"]
+
+            def fmt(d):
+                if isinstance(d, datetime):
+                    return d.strftime("%d.%m.%Y %H:%M")
+                if isinstance(d, date):
+                    return d.strftime("%d.%m.%Y")
+                return str(d) if d is not None else ""
+
             result.append({
                 "loanID": loan["loanID"],
                 "bookID": loan["bookID"],
                 "bookName": book.bookName,
                 "author": book.authorName,
-                "loanDate": str(loan["loanDate"]),
-                "returnDate": str(loan["returnDate"])
+                "loanDate": fmt(ld),
+                "returnDate": fmt(rd)
             })
 
         return result

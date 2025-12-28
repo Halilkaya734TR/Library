@@ -1,6 +1,9 @@
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from services.categoryService import CategoryService
+from repository.adminLogRepository import AdminLogRepository
+from repository.adminRepository import AdminRepository
+from datetime import datetime
 
 categoryBp = Blueprint("category", __name__)
 
@@ -15,6 +18,13 @@ def adminKategoriler():
 def kategoriEkle():
     data = request.get_json()
     CategoryService.addCategory(data)
+    try:
+        admin_id = get_jwt_identity()
+        admin = AdminRepository.getAdminById(admin_id)
+        AdminLogRepository.saveParams(admin_id, admin.name, 13, datetime.now(), {"categoryName": data.get("categoryName")})
+    except Exception:
+        pass
+
     return jsonify({"message": "Kategori eklendi"})
 
 @categoryBp.route("/kategoriDuzenleme", methods=["POST"])
@@ -22,6 +32,13 @@ def kategoriEkle():
 def kategoriDuzenleme():
     data = request.get_json()
     CategoryService.editCategory(data)
+    try:
+        admin_id = get_jwt_identity()
+        admin = AdminRepository.getAdminById(admin_id)
+        AdminLogRepository.saveParams(admin_id, admin.name, 14, datetime.now(), {"categoryID": data.get("categoryID"), "categoryName": data.get("categoryName")})
+    except Exception:
+        pass
+
     return jsonify({"message": "Kategori güncellendi"})
 
 @categoryBp.route("/kategoriSilme", methods=["POST"])
@@ -30,6 +47,13 @@ def kategoriSilme():
     ids = request.get_json().get("ids", [])
     try:
         CategoryService.deleteCategories(ids)
+        try:
+            admin_id = get_jwt_identity()
+            admin = AdminRepository.getAdminById(admin_id)
+            AdminLogRepository.saveParams(admin_id, admin.name, 15, datetime.now(), {"deletedIDs": ids})
+        except Exception:
+            pass
+
         return jsonify({"message": "Kategoriler silindi"})
     except Exception as ex:
         msg = str(ex)

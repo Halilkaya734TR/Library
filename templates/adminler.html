@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin | Adminler</title>
+    <style>
+        *
+        { 
+            box-sizing:border-box; 
+        }
+
+        body
+        {
+            margin:0;
+            height:100vh;
+            display:flex;
+            font-family:Segoe UI,sans-serif;
+            background:#f3f4f6;
+        }
+
+        .sidebar
+        {
+            width:240px;
+            background:#111827;
+            color:white;
+            padding:20px;
+        }
+
+        .sidebar h2
+        { 
+            text-align:center; 
+            margin-bottom:25px; 
+        }
+
+        .sidebar button
+        {
+            width:100%;
+            padding:12px;
+            margin:6px 0;
+            background:none;
+            border:none;
+            color:white;
+            text-align:left;
+            cursor:pointer;
+            border-radius:10px;
+        }
+
+        .sidebar button:hover
+        { 
+            background:#1f2937;
+        }
+
+        .content
+        {
+            flex:1;
+            padding:25px;
+            display:flex;
+            flex-direction:column;
+        }
+
+        .page-title
+        {
+            font-size:26px;
+            margin-bottom:12px;
+        }
+
+        .table-box
+        {
+            flex:1;
+            background:white;
+            border-radius:16px;
+            box-shadow:0 6px 18px rgba(0,0,0,.15);
+            overflow:auto;
+        }
+
+        table
+        {
+            width:100%;
+            border-collapse:collapse;
+        }
+
+        th,td
+        {
+            padding:12px 14px;
+            border-bottom:1px solid #e5e7eb;
+        }
+
+        th
+        {
+            background:#2563eb;
+            color:white;
+        }
+
+        tr:nth-child(even)
+        {
+            background:#f9fafb;
+        }
+
+        .bottom-bar
+        {
+            margin-top:14px;
+            background:white;
+            padding:16px;
+            border-radius:16px;
+            box-shadow:0 4px 12px rgba(0,0,0,.15);
+            display:flex;
+            justify-content:flex-end;
+            gap:10px;
+        }
+
+        .btn
+        {
+            padding:12px 22px;
+            border:none;
+            border-radius:12px;
+            color:white;
+            cursor:pointer;
+            font-size:15px;
+        }
+
+        .add
+        { 
+            background:#16a34a; 
+        }
+
+        .delete
+        { 
+            background:#dc2626; 
+        }
+
+        .modal
+        {
+            display:none;
+            position:fixed;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+            background:rgba(0,0,0,.5);
+            justify-content:center;
+            align-items:center;
+            z-index:999;
+        }
+
+        .modal-content
+        {
+            background:white;
+            padding:30px;
+            border-radius:16px;
+            box-shadow:0 10px 40px rgba(0,0,0,.3);
+            width:90%;
+            max-width:400px;
+        }
+
+        .modal-content h3
+        {
+            margin-top:0;
+            margin-bottom:20px;
+        }
+
+        .modal-content input
+        {
+            width:100%;
+            padding:12px;
+            margin-bottom:15px;
+            border:1px solid #e5e7eb;
+            border-radius:8px;
+            font-size:14px;
+        }
+
+        .modal-buttons
+        {
+            display:flex;
+            gap:10px;
+            justify-content:flex-end;
+        }
+
+        .modal-buttons button
+        {
+            padding:10px 20px;
+            border:none;
+            border-radius:8px;
+            cursor:pointer;
+            font-size:14px;
+        }
+
+        .modal-buttons .ok
+        {
+            background:#2563eb;
+            color:white;
+        }
+
+        .modal-buttons .cancel
+        {
+            background:#e5e7eb;
+            color:#333;
+        }
+
+        .default-badge
+        {
+            background:#fbbf24;
+            color:#333;
+            padding:4px 8px;
+            border-radius:4px;
+            font-size:12px;
+            font-weight:bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>Admin Paneli</h2>
+        <button onclick="window.location.href='{{url_for('admin.kitapİslemler')}}'">📚 Kitap İşlemleri</button>
+        <button onclick="window.location.href='{{url_for('admin.yazarlar')}}'">✍️ Yazar İşlemleri</button>
+        <button onclick="window.location.href='{{url_for('admin.kategoriler')}}'">📂 Kategori İşlemleri</button>
+        <button onclick="window.location.href='{{url_for('admin.yayinevi')}}'">📖 Yayınevi İşlemleri</button>
+        <button onclick="window.location.href='{{url_for('admin.cezalar')}}'">⛔ Kütüphane Cezaları</button>
+        <button onclick="window.location.href='{{url_for('admin.kullanicilar')}}'">👤 Kullanıcılar</button>
+        <button onclick="window.location.href='{{url_for('admin.loglar')}}'">🧾 Kütüphane Logları</button>
+        <button onclick="window.location.href='{{url_for('admin.adminler')}}'">👨‍💼 Adminler</button>
+        <button onclick="window.location.href='{{url_for('admin.adminInfo')}}'">⚙️ Hesap Bilgileri</button>
+        <button class="logout" onclick="window.location.href='{{url_for('admin.logout')}}'">🚪 Çıkış</button>
+    </div>
+
+    <div class="content">
+
+        <div class="page-title">👨‍💼 Adminler</div>
+
+        <div class="table-box" id="adminTablosu">
+            <p style="padding:20px">Adminler yükleniyor...</p>
+        </div>
+
+        <div class="bottom-bar">
+            <button class="btn add" onclick="ekleModal();">+ Admin Ekle</button>
+            <button class="btn delete" onclick="seciliSil();">🗑️ Seçilenleri Sil</button>
+        </div>
+
+    </div>
+
+    <div id="ekleModal" class="modal">
+        <div class="modal-content">
+            <h3>Admin Ekle</h3>
+            <input type="text" id="adminName" placeholder="Admin Adı">
+            <input type="email" id="adminEmail" placeholder="Email">
+            <input type="password" id="adminPassword" placeholder="Şifre">
+            <div class="modal-buttons">
+                <button class="cancel" onclick="ekleModal();">İptal</button>
+                <button class="ok" onclick="adminEkle();">Ekle</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let admins = [];
+        let secilenler = [];
+        let adminTablosu;
+        const CURRENT_ADMIN_ID = {{ currentAdminId|tojson }};
+
+        function sha256Hex(str) 
+        {
+            const enc = new TextEncoder();
+            const data = enc.encode(str);
+            return crypto.subtle.digest('SHA-256', data).then(function(hashBuffer)
+            {
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                return hashArray.map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+            });
+        }
+
+        function yukle()
+        {
+            fetch("/admin/adminler-veri", { credentials: "include" })
+            .then(r=>{
+                if(!r.ok){ throw new Error("Yetkisiz veya ağ hatası"); }
+                return r.json();
+            })
+            .then(d=>{
+                admins = Array.isArray(d) ? d : [];
+                tablo();
+            })
+            .catch(()=>{
+                admins = [];
+                tablo();
+            });
+        }
+
+        function tablo()
+        {
+            let h = `<table>
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Admin ID</th>
+                    <th>Ad</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody>`;
+
+            admins.forEach(a=>{
+                let badge = a.id == 1 ? '<span class="default-badge">VARSAYILAN</span>' : '';
+                if (a.id == CURRENT_ADMIN_ID){
+                    badge = '<span class="default-badge">HESABINIZ</span>' + (badge? ' ' + badge : '');
+                }
+                let checkbox = (a.id == 1 || a.id == CURRENT_ADMIN_ID) ? '' : `<input type="checkbox" value="${a.id}" onchange="sec(this)">`;
+                
+                h += `<tr>
+                    <td>
+                        ${checkbox}
+                    </td>
+                    <td>${a.id}</td>
+                    <td>${a.name} ${badge}</td>
+                    <td>${a.email}</td>
+                </tr>`;
+            });
+
+            h += `</tbody></table>`;
+            adminTablosu.innerHTML = h;
+        }
+
+        function sec(cb)
+        {
+            let id = cb.value;
+            if(cb.checked)
+            {
+                if(!secilenler.includes(id)) 
+                {
+                    secilenler.push(id);
+                }
+            }
+            else
+            {
+                secilenler = secilenler.filter(x=>x!=id);
+            }
+        }
+
+        function ekleModal()
+        {
+            let modal = document.getElementById("ekleModal");
+            if(modal.style.display == "flex")
+            {
+                modal.style.display = "none";
+                document.getElementById("adminName").value = "";
+                document.getElementById("adminEmail").value = "";
+                document.getElementById("adminPassword").value = "";
+            }
+            else
+            {
+                modal.style.display = "flex";
+            }
+        }
+
+        async function adminEkle()
+        {
+            try
+            {
+                const name = document.getElementById("adminName").value.trim();
+                const email = document.getElementById("adminEmail").value.trim();
+                const password = document.getElementById("adminPassword").value.trim();
+
+                if(!name || !email || !password)
+                {
+                    alert("Tüm alanları doldurunuz");
+                    return;
+                }
+
+                const addBtn = document.querySelector('#ekleModal .ok');
+                if(addBtn)
+                { 
+                    addBtn.disabled = true; addBtn.textContent = 'Gönderiliyor...'; 
+                }
+
+                const hashedPassword = await sha256Hex(password);
+
+                const res = await fetch("/admin/adminEkle", {
+                    method:"POST",
+                    headers:{ "Content-Type":"application/json" },
+                    credentials:"include",
+                    body: JSON.stringify({ adminName: name, email, password: hashedPassword })
+                });
+
+                let data;
+                try
+                { 
+                    data = await res.json(); 
+                }
+                catch
+                { 
+                    data = { success:false, message:"Beklenmeyen yanıt" }; 
+                }
+
+                if(!res.ok || data.success == false)
+                {
+                    throw new Error(data.message || "İstek başarısız");
+                }
+
+                alert(data.message || "Admin eklendi");
+                ekleModal();
+                yukle();
+                secilenler = [];
+            }
+            catch(err)
+            {
+                alert(err.message || "Hata oluştu");
+                console.error(err);
+            }
+            finally
+            {
+                const addBtn = document.querySelector('#ekleModal .ok');
+                if(addBtn)
+                { 
+                    addBtn.disabled = false; addBtn.textContent = 'Ekle'; 
+                }
+            }
+        }
+
+
+
+        function seciliSil()
+        {
+            if(secilenler.length == 0)
+            {
+                alert("Silmek için admin seçin");
+                return;
+            }
+
+            if(!confirm(`${secilenler.length} admin silinsin mi?`))
+            {
+                return;
+            }
+
+            secilenler.forEach(id=>{
+                fetch("/admin/adminSil", {
+                    method:"POST",
+                    headers:{ "Content-Type":"application/json" },
+                    credentials:"include",
+                    body:JSON.stringify({ adminID: id })
+                })
+                .then(r=>r.json())
+                .then(d=>{
+                    if(!d.success){
+                        alert(d.message);
+                    }
+                });
+            });
+
+            setTimeout(()=>{
+                secilenler = [];
+                yukle();
+            }, 500);
+        }
+
+        window.onload=()=>{
+            adminTablosu = document.getElementById("adminTablosu");
+            yukle();
+        };
+    </script>
+    </body>
+</html>

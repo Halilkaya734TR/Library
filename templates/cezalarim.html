@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="tr">
+    <head>
+    <meta charset="UTF-8">
+    <title>Cezalarım</title>
+    <style>
+        
+        body
+        {
+            margin:0;
+            height:100vh;
+            display:flex;
+            font-family:Segoe UI, sans-serif;
+            background:#f3f4f6;
+        }
+
+        .sidebar
+        {
+            width:220px;
+            background:#1f2933;
+            color:white;
+            padding:20px;
+        }
+        
+        .sidebar h2
+        {
+            text-align:center;
+            margin-bottom:30px;
+        }
+       
+        .sidebar button
+        {
+            width:100%;
+            padding:12px;
+            margin:8px 0;
+            background:none;
+            border:none;
+            color:white;
+            text-align:left;
+            cursor:pointer;
+        }
+
+        .sidebar button:hover
+        { 
+            background:#374151; 
+        }
+
+        .logout
+        { 
+            background:#b91c1c !important; 
+        }
+
+        .content
+        {
+            flex:1;
+            padding:25px;
+            display:flex;
+            flex-direction:column;
+        }
+
+        .page-title
+        {
+            font-size:32px;
+            margin-bottom:10px;
+            text-align:center;
+        }
+
+        #onayAlan
+        {
+            display:none;
+            margin: 0 auto 20px auto;
+            max-width:600px;
+            background:#fff3cd;
+            color:#856404;
+            padding:14px 18px;
+            border-radius:12px;
+            box-shadow:0 6px 18px rgba(0,0,0,.15);
+            align-items:center;
+            justify-content:space-between;
+            gap:12px;
+        }
+
+        #onayAlan button
+        {
+            padding:6px 14px;
+            border:none;
+            border-radius:8px;
+            cursor:pointer;
+            font-size:14px;
+        }
+
+        #btnIptal
+        { 
+            background:#9ca3af; 
+            color:white; 
+        }
+
+        #btnOnayla
+        { 
+            background:#16a34a; 
+            color:white; 
+        }
+
+        #cezaPanel
+        {
+            flex:1;
+            background:white;
+            padding:20px;
+            border-radius:16px;
+            box-shadow:0 6px 18px rgba(0,0,0,.15);
+            overflow:auto;
+        }
+
+        table
+        {
+            width:100%;
+            border-collapse:collapse;
+        }
+
+        th,td
+        {
+            padding:12px 15px;
+            border-bottom:1px solid #e5e7eb;
+        }
+
+        th
+        {
+            background:#2563eb;
+            color:white;
+        }
+
+        tr:nth-child(even)
+        { 
+            background:#f9fafb; 
+        }
+
+        #bottomBar
+        {
+            margin-top:15px;
+            display:flex;
+            justify-content:flex-end;
+        }
+
+        #payAllBtn
+        {
+            padding:12px 22px;
+            border:none;
+            border-radius:10px;
+            background:#16a34a;
+            color:white;
+            font-size:15px;
+            cursor:pointer;
+        }
+
+        #payAllBtn:disabled
+        {
+            background:#9ca3af;
+            cursor:not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Üye Paneli</h2>
+        <button onclick="window.location.href='{{url_for('user.kitaplarSayfasi')}}'">📚 Kitaplar</button>
+        <button onclick="window.location.href='{{url_for('user.kitaplarim')}}'">📖 Kitaplarım</button>
+        <button onclick="window.location.href='{{url_for('user.cezalarim')}}'">⚠️ Ceza Bilgi</button>
+        <button onclick="window.location.href='{{ url_for('user.islemGecmisi') }}'">🧾 İşlem Geçmişi</button>
+        <button onclick="window.location.href='{{url_for('user.memberInfo')}}'">⚙️ Hesap Bilgileri</button>
+        <button class="logout" onclick="window.location.href='{{url_for('user.logout')}}'">🚪 Çıkış</button>
+    </div>
+
+    <div class="content">
+
+        <div class="page-title">Cezalarım</div>
+
+        <div id="onayAlan">
+            <span id="onayText">Toplam ceza: 0 TL — ödensin mi?</span>
+            <div style="display:flex; gap:8px;">
+                <button id="btnIptal" onclick="onayKapat()">İptal</button>
+                <button id="btnOnayla" onclick="onayla()">Onayla</button>
+            </div>
+        </div>
+
+        <div id="cezaPanel">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ceza No</th>
+                        <th>Kitap No</th>
+                        <th>Gecikme</th>
+                        <th>Tutar</th>
+                        <th>Tarih</th>
+                    </tr>
+                </thead>
+                <tbody id="cezaTableBody">
+                    <tr><td colspan="5">Veriler yükleniyor...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="bottomBar">
+            <button id="payAllBtn" onclick="odemeSor()" disabled>
+                Tüm Cezaları Öde
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        let toplamTutar = 0;
+        let cezaIDList = [];
+
+        fetch("/cezalarim-veri")
+        .then(r => r.json())
+        .then(veri => {
+            const tbody = document.getElementById("cezaTableBody");
+            const payBtn = document.getElementById("payAllBtn");
+
+            if (Array.isArray(veri) && veri.length > 0) 
+            {
+                let h = "";
+                toplamTutar = 0;
+                cezaIDList = [];
+
+                veri.forEach(c => {
+                    const tutar = parseFloat(c.sum);
+                    toplamTutar += tutar;
+                    cezaIDList.push(c.ID);
+
+                    h += `<tr>
+                        <td>${c.ID}</td>
+                        <td>${c.bookID}</td>
+                        <td>${c.delay} gün</td>
+                        <td>${tutar.toFixed(2)} TL</td>
+                        <td>${c.firstDay}</td>
+                    </tr>`;
+                });
+
+                tbody.innerHTML = h;
+                payBtn.disabled = false;
+            } 
+            else 
+            {
+                tbody.innerHTML =
+                    '<tr><td colspan="5">Ceza kaydı bulunmamaktadır.</td></tr>';
+                payBtn.disabled = true;
+            }
+        });
+
+        function odemeSor()
+        {
+            document.getElementById("onayText").innerText =
+                `Toplam ceza: ${toplamTutar.toFixed(2)} TL — ödensin mi?`;
+            document.getElementById("onayAlan").style.display = "flex";
+        }
+
+        function onayKapat()
+        {
+            document.getElementById("onayAlan").style.display = "none";
+        }
+
+        function onayla()
+        {
+            fetch("/cezalar-ode",{
+                method:"POST",
+                headers:{ "Content-Type":"application/json" },
+                credentials:"include",
+                body:JSON.stringify({ cezaIDs: cezaIDList })
+            })
+            .then(r=>r.json())
+            .then(res=>{
+                if(res.success)
+                {
+                    alert("Tüm cezalar başarıyla ödendi");
+                    location.reload();
+                }
+                else
+                {
+                    alert(res.message || "Ödeme başarısız");
+                }
+            });
+        }
+    </script>
+</body>
+</html>

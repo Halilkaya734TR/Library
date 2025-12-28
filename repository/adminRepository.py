@@ -1,5 +1,7 @@
 from config.db import getConnection
 from models.adminModel import Admin
+from repository.adminLogRepository import AdminLogRepository
+from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 
 class AdminRepository:
@@ -39,39 +41,73 @@ class AdminRepository:
         con.commit()
         cur.close()
         con.close()
+
+        AdminLogRepository.save(adminId, name, 19, datetime.now())
+        AdminLogRepository.updateAdminName(adminId, name)
         return True
 
     @staticmethod
-    def changePassword(adminId, old_password, new_password):
-        admin = AdminRepository.getAdminById(adminId)
-        if not admin:
-            return False, "Admin bulunamadı"
-
-        if not check_password_hash(admin.sifre, old_password):
-            return False, "Eski şifre yanlış"
-
-        hashed = generate_password_hash(new_password)
+    def changePassword(adminId, newPassword):
+        hashed = generate_password_hash(newPassword)
         con = getConnection()
         cur = con.cursor()
         cur.execute("UPDATE admin SET password=%s WHERE adminID=%s", (hashed, adminId))
         con.commit()
         cur.close()
         con.close()
+        
+        admin = AdminRepository.getAdminById(adminId)
+        AdminLogRepository.save(adminId, admin.name, 20, datetime.now())
         return True, "Şifre güncellendi"
 
     @staticmethod
-    def deleteAdmin(adminId, password):
+    def deleteAdmin(adminId):
         admin = AdminRepository.getAdminById(adminId)
-        if not admin:
-            return False, "Admin bulunamadı"
-
-        if not check_password_hash(admin.sifre, password):
-            return False, "Şifre yanlış"
-
         con = getConnection()
         cur = con.cursor()
         cur.execute("DELETE FROM admin WHERE adminID=%s", (adminId,))
         con.commit()
         cur.close()
         con.close()
+
+        AdminLogRepository.saveParams(adminId, admin.name, 21, datetime.now(), {"adminName":admin.name})
         return True, "Hesap silindi"
+
+    @staticmethod
+    def getAllAdmins():
+        con = getConnection()
+        cur = con.cursor(dictionary=True)
+        cur.execute("SELECT adminID, adminName, email FROM admin")
+        rows = cur.fetchall()
+        cur.close()
+        con.close()
+
+        admins = []
+        for row in rows:
+            admins.append({
+                "id": row["adminID"],
+                "name": row["adminName"],
+                "email": row["email"]
+            })
+        return admins
+
+    @staticmethod
+    def insertAdmin(name, email, password_hash):
+        con = getConnection()
+        cur = con.cursor()
+        cur.execute("INSERT INTO admin (adminName, email, password) VALUES (%s, %s, %s)",
+                    (name, email, password_hash))
+        con.commit()
+        cur.close()
+        con.close()
+        return True
+
+    @staticmethod
+    def deleteAdminById(adminId):
+        con = getConnection()
+        cur = con.cursor()
+        cur.execute("DELETE FROM admin WHERE adminID=%s", (adminId,))
+        con.commit()
+        cur.close()
+        con.close()
+        return True

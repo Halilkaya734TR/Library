@@ -1,6 +1,9 @@
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from services.publisherService import PublisherService
+from repository.adminLogRepository import AdminLogRepository
+from repository.adminRepository import AdminRepository
+from datetime import datetime
 
 publisherBp = Blueprint("publisher", __name__)
 
@@ -15,6 +18,12 @@ def adminYayinevleri():
 def kategoriEkle():
     data = request.get_json()
     PublisherService.addPublisher(data)
+    try:
+        admin_id = get_jwt_identity()
+        admin = AdminRepository.getAdminById(admin_id)
+        AdminLogRepository.saveParams(admin_id, admin.name, 16, datetime.now(), {"publisherName": data.get("publisherName")})
+    except Exception:
+        pass
     return jsonify({"message": "Yayınevi eklendi"})
 
 @publisherBp.route("/yayineviDuzenleme", methods=["POST"])
@@ -22,6 +31,12 @@ def kategoriEkle():
 def yayineviDuzenleme():
     data = request.get_json()
     PublisherService.editPublisher(data)
+    try:
+        admin_id = get_jwt_identity()
+        admin = AdminRepository.getAdminById(admin_id) if admin_id else None
+        AdminLogRepository.saveParams(admin_id, admin.name, 17, datetime.now(), {"publisherID": data.get("publisherID"), "publisherName": data.get("publisherName")})
+    except Exception:
+        pass
     return jsonify({"message": "Yayınevi güncellendi"})
 
 @publisherBp.route("/yayineviSilme", methods=["POST"])
@@ -30,6 +45,12 @@ def yayineviSilme():
     ids = request.get_json().get("ids", [])
     try:
         PublisherService.deletePublisher(ids)
+        try:
+            admin_id = get_jwt_identity()
+            admin = AdminRepository.getAdminById(admin_id)
+            AdminLogRepository.saveParams(admin_id, admin.name, 18, datetime.now(), {"deletedIDs": ids})
+        except Exception:
+            pass
         return jsonify({"message": "Yayınevleri silindi"})
     except Exception as ex:
         msg = str(ex)

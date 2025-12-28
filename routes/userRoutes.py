@@ -2,7 +2,7 @@ from flask import Blueprint, request, session, redirect, url_for, flash, render_
 from services.userService import UserService
 from repository.userRepository import UserRepository
 from repository.userLogRepository import UserLogRepository
-from flask_jwt_extended import create_access_token, jwt_required, unset_jwt_cookies, set_access_cookies
+from flask_jwt_extended import create_access_token, jwt_required, unset_jwt_cookies, set_access_cookies, get_jwt_identity
 
 
 userBp = Blueprint("user", __name__)
@@ -16,12 +16,13 @@ def userLogin():
     email = request.form.get("email") or request.args.get("email")
     password = request.form.get("password") or request.args.get("password")
 
-    user = UserService.login(email, password)
+    user, error = UserService.login(email, password)
+
     if not user:
         if request.accept_mimetypes.best == "application/json":
-            return jsonify(msg="Hatalı giriş"), 401
+            return jsonify(success=False, msg=error), 401
 
-        flash("Girilen bilgiler uyuşmuyor!", "danger")
+        flash(error, "danger")
         return redirect(url_for("user.index"))
 
     token = create_access_token(identity=str(user.memberID))
@@ -42,7 +43,7 @@ def userLogin():
     set_access_cookies(response, token)
 
     session["userID"] = user.memberID
-    session["userName"]= user.username
+    session["userName"] = user.username
 
     flash("Giriş Başarılı!", "success")
     return response
@@ -50,7 +51,8 @@ def userLogin():
 @userBp.route("/member")
 @jwt_required()
 def member():
-    return render_template("member.html", username=session.get("userName"))
+    username = session.get("userName")
+    return render_template("member.html", username=username)
 
 @userBp.route("/kitaplar-sayfasi")
 @jwt_required()
@@ -76,11 +78,15 @@ def register():
     flash("Kayıt başarılı! Giriş yapabilirsiniz!", "success")
     return redirect(url_for("user.index"))
 
+@userBp.route("/cezalarim")
+@jwt_required()
+def cezalarim():
+    return render_template("cezalarim.html")
 
 @userBp.route("/memberInfo")
 @jwt_required()
 def memberInfo():
-    memberID = session.get("userID")
+    memberID = get_jwt_identity()
     member = None
     if memberID:
         memberObj = UserRepository.getUserById(memberID)
@@ -98,8 +104,22 @@ def islemGecmisi():
 @userBp.route("/userLogs")
 @jwt_required()
 def getUserLogs():
-    memberID = session.get('userID')
+    from datetime import datetime, date
+    
+    memberID = get_jwt_identity()
     rows = UserLogRepository.getAll(memberID)
+    
+    def fmt(d):
+        if isinstance(d, datetime):
+            return d.strftime("%d.%m.%Y %H:%M:%S")
+        if isinstance(d, date):
+            return d.strftime("%d.%m.%Y")
+        return str(d) if d is not None else ""
+    
+    for row in rows:
+        if "logDate" in row:
+            row["logDate"] = fmt(row["logDate"])
+    
     return jsonify(rows)
 
 
@@ -107,7 +127,7 @@ def getUserLogs():
 @jwt_required()
 def kullaniciProfilGuncelle():
     data = request.get_json()
-    memberID = session.get('userID')
+    memberID = get_jwt_identity()
     if not memberID:
         return jsonify({"success": False, "message": "Yetkisiz"}), 401
 
@@ -123,7 +143,7 @@ def kullaniciProfilGuncelle():
 @jwt_required()
 def kullaniciSifreDegistir():
     data = request.get_json()
-    memberID = session.get('userID')
+    memberID = get_jwt_identity()
     if not memberID:
         return jsonify({"success": False, "message": "Yetkisiz"}), 401
 
@@ -144,7 +164,7 @@ def kullaniciSifreDegistir():
 @jwt_required()
 def kullaniciSil():
     data = request.get_json()
-    memberID = session.get('userID')
+    memberID = get_jwt_identity()
     if not memberID:
         return jsonify({"success": False, "message": "Yetkisiz"}), 401
 

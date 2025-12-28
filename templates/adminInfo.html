@@ -168,6 +168,10 @@
             <button onclick="window.location.href='{{url_for('admin.yazarlar')}}'">✍️ Yazar İşlemleri</button>
             <button onclick="window.location.href='{{url_for('admin.kategoriler')}}'">🗂️ Kategori İşlemleri</button>
             <button onclick="window.location.href='{{url_for('admin.yayinevi')}}'">📖 Yayınevi İşlemleri</button>
+            <button onclick="window.location.href='{{url_for('admin.cezalar')}}'">⛔ Kütüphane Cezaları</button>
+            <button onclick="window.href='{{url_for('admin.kullanicilar')}}'">👤 Kullanıcılar</button>
+            <button onclick="window.location.href='{{url_for('admin.loglar')}}'">🧾 Kütüphane Logları</button>
+            <button onclick="window.location.href='{{url_for('admin.adminler')}}'">👨‍💼 Adminler</button>
             <button onclick="window.location.href='{{url_for('admin.adminInfo')}}'">⚙️ Hesap Bilgileri</button>
             <button class="logout" onclick="window.location.href='{{url_for('admin.logout')}}'">🚪 Çıkış</button>
         </div>
@@ -177,11 +181,11 @@
                 <h3>⚙️ Hesap Bilgileri</h3>
                 <div class="form-group">
                     <label>Kullanıcı Adı</label>
-                    <input id="username" value="{{ admin.username }}">
+                    <input id="username" placeholder="Yükleniyor...">
                 </div>
                 <div class="form-group">
                     <label>E-posta</label>
-                    <input id="email" value="{{ admin.email }}">
+                    <input id="email" placeholder="Yükleniyor...">
                 </div>
 
                 <button class="btn btn-primary" onclick="saveProfile()">Kaydet</button>
@@ -220,6 +224,23 @@
             </div>
         </div>
         <script>
+            window.onload = function() 
+            {
+                fetch("/adminInfo/veri", {
+                    method: "GET",
+                    headers: {"Content-Type": "application/json"},
+                    credentials: 'include'
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.success && data.data) {
+                        document.getElementById("username").value = data.data.username;
+                        document.getElementById("email").value = data.data.email;
+                    }
+                })
+                .catch(err => console.error("Admin info yüklenirken hata:", err));
+            };
+
             function openPassword()
             {
                 document.getElementById("passwordModal").style.display="flex";

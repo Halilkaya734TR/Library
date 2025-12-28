@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin | Kullanıcı İşlemleri</title>
+    <style>
+    *
+    {
+        box-sizing:border-box;
+    }
+
+    body
+    {
+        margin:0;
+        height:100vh;
+        display:flex;
+        font-family:Segoe UI,sans-serif;
+        background:#f3f4f6;
+    }
+
+    .sidebar
+    {
+        width:240px;
+        background:#111827;
+        color:white;
+        padding:20px;
+    }
+
+    .sidebar h2
+    {
+        text-align:center;
+        margin-bottom:25px;
+    }
+
+    .sidebar button
+    {
+        width:100%;
+        padding:12px;
+        margin:6px 0;
+        background:none;
+        border:none;
+        color:white;
+        text-align:left;
+        cursor:pointer;
+        border-radius:10px;
+    }
+
+    .sidebar button:hover
+    {
+        background:#1f2937;
+    }
+
+    .logout
+    {
+        background:#991b1b!important;
+    }
+
+    .content
+    {
+        flex:1;
+        padding:25px;
+        display:flex;
+        flex-direction:column;
+        position:relative;
+    }
+
+    .page-title
+    {
+        font-size:26px;
+        margin-bottom:12px;
+    }
+
+    .table-box
+    {
+        flex:1;
+        background:white;
+        border-radius:16px;
+        box-shadow:0 6px 18px rgba(0,0,0,.15);
+        overflow:auto;
+    }
+
+    table
+    {
+        width:100%;
+        border-collapse:collapse;
+    }
+
+    th,td
+    {
+        padding:12px 14px;
+        border-bottom:1px solid #e5e7eb;
+    }
+
+    th
+    {
+        background:#2563eb;
+        color:white;
+    }
+
+    tr:nth-child(even)
+    {
+        background:#f9fafb;
+    }
+
+    .bottom-bar
+    {
+        margin-top:14px;
+        background:white;
+        padding:16px;
+        border-radius:16px;
+        box-shadow:0 4px 12px rgba(0,0,0,.15);
+        display:flex;
+        align-items:center;
+        gap:10px;
+    }
+
+    input
+    {
+        height:42px;
+        padding:0 14px;
+        border-radius:10px;
+        border:1px solid #cbd5e1;
+    }
+
+    .btn
+    {
+        padding:8px 14px;
+        border:none;
+        border-radius:10px;
+        color:white;
+        cursor:pointer;
+        font-size:14px;
+    }
+
+    .active
+    {
+        background:#16a34a;
+    }
+
+    .passive
+    {
+        background:#dc2626;
+    }
+
+    .page-btn
+    {
+        background:#2563eb;
+    }
+
+    .page-btn:disabled
+    {
+        background:#94a3b8;
+    }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Admin Paneli</h2>
+        <button onclick="window.location.href='{{url_for('admin.kitapİslemler')}}'">📚 Kitap İşlemleri</button>
+        <button onclick="window.location.href='{{url_for('admin.yazarlar')}}'">✍️ Yazar İşlemleri</button>
+        <button onclick="window.location.href='{{url_for('admin.kategoriler')}}'">📂 Kategori İşlemleri</button>
+        <button onclick="window.location.href='{{url_for('admin.yayinevi')}}'">📖 Yayınevi İşlemleri</button>
+        <button onclick="window.location.href='{{url_for('admin.cezalar')}}'">⛔ Kütüphane Cezaları</button>
+        <button onclick="window.location.href='{{url_for('admin.kullanicilar')}}'">👤 Kullanıcılar</button>
+        <button onclick="window.location.href='{{url_for('admin.loglar')}}'">🧾 Kütüphane Logları</button>
+        <button onclick="window.location.href='{{url_for('admin.adminler')}}'">👨‍💼 Adminler</button>
+        <button onclick="window.location.href='{{url_for('admin.adminInfo')}}'">⚙️ Hesap Bilgileri</button>
+        <button class="logout" onclick="window.location.href='{{url_for('admin.logout')}}'">🚪 Çıkış</button>
+    </div>
+    <div class="content">
+        <div class="page-title">👤 Kullanıcı İşlemleri</div>
+
+        <div class="table-box" id="userTable">
+            <p style="padding:20px">Kullanıcılar yükleniyor...</p>
+        </div>
+
+        <div class="bottom-bar">
+            <button class="btn page-btn" id="prevBtn" disabled>◀</button>
+            <button class="btn page-btn" id="nextBtn">▶</button>
+            <input type="text" id="search" placeholder="Kullanıcı adı ara..." oninput="filtrele()">
+        </div>
+    </div>
+    <script>
+        let users=[]
+        let filtre=[]
+        let sayfa=0
+        const LIMIT=10
+
+        let userTable,prevBtn,nextBtn,search
+
+        function yukle()
+        {
+            fetch("/admin/kullanicilar") 
+            .then(r=>r.json())
+            .then(d=>{
+                users=d
+                filtre=d
+                sayfa=0
+                tablo()
+            })
+        }
+
+        function tablo()
+        {
+            let s = sayfa * LIMIT
+            let e = s + LIMIT
+            let liste = filtre.slice(s,e)
+
+            let h = `<table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Kullanıcı Adı</th>
+                    <th>E-posta</th>
+                    <th>Katılma Tarihi</th>
+                    <th>Durum</th>
+                    <th>İşlem</th>
+                </tr>
+            </thead>
+            <tbody>`
+
+            liste.forEach(u=>{
+                let aktif = u.status
+
+                h += `
+                <tr>
+                    <td>${u.memberID}</td>
+                    <td>${u.username}</td>
+                    <td>${u.email}</td>
+                    <td>${u.joinDate}</td>
+                    <td>${aktif ? "Aktif" : "Pasif"}</td>
+                    <td>
+                        <button 
+                            class="btn ${aktif ? "passive" : "active"}"
+                            onclick="durumDegistir(${u.memberID}, ${aktif})">
+                            ${aktif ? "Pasif Yap" : "Aktif Yap"}
+                        </button>
+                    </td>
+                </tr>`
+            })
+
+            h += `</tbody></table>`
+            userTable.innerHTML = h
+
+            prevBtn.disabled = (sayfa == 0)
+            nextBtn.disabled = (e >= filtre.length)
+        }
+
+        function filtrele()
+        {
+            let a=(search.value||"").toLowerCase()
+            filtre=users.filter(u=>u.username.toLowerCase().includes(a))
+            sayfa=0
+            tablo()
+        }
+
+        function durumDegistir(id, aktif)
+        {
+            fetch("/admin/kullaniciDurum",{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            credentials:"include",
+            body:JSON.stringify({
+                memberID: id,
+                status: !aktif
+            })
+        }).then(()=>yukle())
+    }
+
+        window.onload=()=>{
+            userTable=document.getElementById("userTable")
+            prevBtn=document.getElementById("prevBtn")
+            nextBtn=document.getElementById("nextBtn")
+            search=document.getElementById("search")
+
+            prevBtn.onclick=()=>{if(sayfa>0){sayfa--;tablo()}}
+            nextBtn.onclick=()=>{if((sayfa+1)*LIMIT<filtre.length){sayfa++;tablo()}}
+
+            yukle()
+        }
+        </script>
+    </body>
+</html>

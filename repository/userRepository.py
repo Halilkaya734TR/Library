@@ -45,6 +45,48 @@ class UserRepository:
         if row:
             return User(memberID=row["memberID"], username=row["username"], email=row["email"], password=row["password"], joinDate=row["joinDate"], status=row["status"])
         return None
+    
+    @staticmethod
+    def getAllUsers():
+        con = getConnection()
+        cur = con.cursor(dictionary=True)
+        cur.execute("SELECT memberID, username, email, joinDate, status FROM member")
+        rows = cur.fetchall()
+        cur.close()
+        con.close()
+
+        members = []
+        for row in rows:
+            members.append(User(memberID=row["memberID"],username=row["username"],email=row["email"],password=None, joinDate=row["joinDate"],status=row["status"]))
+
+        return members
+    
+    @staticmethod
+    def getStatus(memberID):
+        con = getConnection()
+        cur = con.cursor(dictionary=True)
+        cur.execute("SELECT status FROM member WHERE memberID=%s", (memberID,))
+        row = cur.fetchone()
+        cur.close()
+        con.close()
+
+        return row
+    
+    @staticmethod
+    def updateUserStatus(memberID, status: bool):
+        newStatus = "Aktif" if status else "Pasif"
+
+        con = getConnection()
+        cur = con.cursor()
+        cur.execute(
+            "UPDATE member SET status=%s WHERE memberID=%s",
+            (newStatus, memberID)
+        )
+        con.commit()
+        cur.close()
+        con.close()
+
+        return True
 
     @staticmethod
     def updateMember(memberID, username, email):
@@ -60,15 +102,13 @@ class UserRepository:
         return True
 
     @staticmethod
-    def changePassword(memberID, old_password, new_password):
+    def changePassword(memberID, oldPassword, newPassword):
         member = UserRepository.getUserById(memberID)
-        if not member:
-            return False, "Kullanıcı bulunamadı"
 
-        if not check_password_hash(member.password, old_password):
+        if not check_password_hash(member.password, oldPassword):
             return False, "Eski şifre yanlış"
 
-        hashed = generate_password_hash(new_password)
+        hashed = generate_password_hash(newPassword)
         con = getConnection()
         cur = con.cursor()
         cur.execute("UPDATE member SET password=%s WHERE memberID=%s", (hashed, memberID))

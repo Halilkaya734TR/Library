@@ -1,6 +1,5 @@
 from config.db import getConnection
 from models.publisherModel import Publisher
-
 class PublisherRepository:
 
     @staticmethod
