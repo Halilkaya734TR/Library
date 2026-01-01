@@ -5,7 +5,7 @@
 - [Kullanılan Teknolojiler](#kullanılan-teknolojiler)
 - [Sayfa Görünümü](#sayfa-görünümü)  
 - [ER Diyagramı](#er-diyagramı) 
-- [Rapor]
+- [Rapor](#rapor)
 
 ## Proje Ön Bilgi
 - Bir kütüphanenin işlevlerini kapsayan arayüzlü bir websitesi projesidir. 
